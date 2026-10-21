@@ -6,6 +6,7 @@ import { Play } from "lucide-react";
 import { CldImage } from "@/components/ui/CldImage";
 import { CldVideo } from "@/components/ui/CldVideo";
 import { cn } from "@/lib/utils";
+import { NoImage } from "@/components/ui/NoImage";
 
 export type GalleryItem = {
   id: string;
@@ -22,7 +23,7 @@ export function ProductGallery({
   name: string;
 }) {
   const [active, setActive] = useState(0);
-  if (items.length === 0) return <div className="skeleton aspect-[3/4]" />;
+  if (items.length === 0) return <NoImage />;
 
   const current = items[Math.min(active, items.length - 1)];
 

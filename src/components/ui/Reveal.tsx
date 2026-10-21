@@ -58,8 +58,28 @@ export function RevealWords({
 
   if (reduce) return <span className={className}>{text}</span>;
 
+  /*
+   * The scroll trigger sits on the unclipped wrapper, not on each word.
+   *
+   * It used to live on the word itself, which deadlocked: the word starts
+   * translated 110% down, its parent masks overflow, so the word was clipped
+   * entirely out of the viewport -- and IntersectionObserver reports a fully
+   * clipped element as not intersecting. The reveal therefore never fired and
+   * the heading stayed invisible permanently, scrolling included. Observing
+   * the wrapper (which is never clipped) and driving the words through
+   * variants breaks the cycle.
+   */
   return (
-    <span className={className}>
+    <motion.span
+      className={className}
+      initial="hidden"
+      whileInView="shown"
+      viewport={{ once: true, margin: "-60px" }}
+      variants={{
+        hidden: {},
+        shown: { transition: { staggerChildren: 0.06, delayChildren: delay } },
+      }}
+    >
       {words.map((word, i) => (
         <span
           key={`${word}-${i}`}
@@ -67,17 +87,15 @@ export function RevealWords({
         >
           <motion.span
             className="inline-block"
-            initial={{ y: "110%" }}
-            whileInView={{ y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.9, delay: delay + i * 0.06, ease: EASE }}
+            variants={{ hidden: { y: "110%" }, shown: { y: 0 } }}
+            transition={{ duration: 0.9, ease: EASE }}
           >
             {word}
-            {i < words.length - 1 ? " " : ""}
+            {i < words.length - 1 ? " " : ""}
           </motion.span>
         </span>
       ))}
-    </span>
+    </motion.span>
   );
 }
 

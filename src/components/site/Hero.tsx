@@ -105,15 +105,18 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                 )}
 
                 {slide.ctaHref && slide.ctaLabel && (
-                  <div className="mt-9 flex flex-wrap items-center gap-3">
-                    <Link href={slide.ctaHref} className="btn-light group">
+                  <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                    <Link href={slide.ctaHref} className="btn-light group w-full sm:w-auto">
                       {slide.ctaLabel}
                       <ArrowRight
                         className="h-3.5 w-3.5 transition-transform duration-500 group-hover:translate-x-1"
                         strokeWidth={1.5}
                       />
                     </Link>
-                    <Link href="/atelier" className="btn-outline-light">
+                    <Link
+                      href="/atelier"
+                      className="btn-outline-light w-full sm:w-auto"
+                    >
                       Book an appointment
                     </Link>
                   </div>

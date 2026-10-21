@@ -1,7 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { IndianRupee, Package, Receipt, Users, Images, CreditCard } from "lucide-react";
+import {
+  IndianRupee,
+  Package,
+  Receipt,
+  Users,
+  Images,
+  CreditCard,
+  CalendarDays,
+  Sparkles,
+  Check,
+  MailWarning,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -16,6 +27,10 @@ const ICONS = {
   users: Users,
   images: Images,
   card: CreditCard,
+  calendar: CalendarDays,
+  sparkles: Sparkles,
+  check: Check,
+  alert: MailWarning,
 } as const;
 
 export type StatIcon = keyof typeof ICONS;

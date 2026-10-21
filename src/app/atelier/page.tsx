@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { prisma } from "@/lib/db";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { PageHero } from "@/components/site/PageHero";
 import { AppointmentForm } from "@/components/site/AppointmentForm";
@@ -40,7 +41,22 @@ const STEPS = [
   },
 ];
 
-export default function AtelierPage() {
+export default async function AtelierPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ piece?: string }>;
+}) {
+  // "Book a fitting" on a product card arrives here as ?piece=<slug>. Resolve
+  // it to the real name rather than echoing the slug back, and ignore it
+  // silently if it no longer matches a live product.
+  const { piece: slug } = await searchParams;
+  const piece = slug
+    ? await prisma.product.findFirst({
+        where: { slug, isActive: true },
+        select: { name: true },
+      })
+    : null;
+
   return (
     <SiteChrome>
       <PageHero
@@ -77,13 +93,15 @@ export default function AtelierPage() {
             <div className="bg-bone-warm p-7">
               <p className="label text-gold">Book a consultation</p>
               <h2 className="display mt-3 text-[28px] text-ink">
-                Come and see the work
+                {piece ? "Try this piece on" : "Come and see the work"}
               </h2>
               <p className="mt-3 font-sans text-[13px] leading-relaxed text-ink-mute">
-                Tell us a little about the occasion and we will find a slot.
+                {piece
+                  ? "We will have it on the floor and in your size for the appointment."
+                  : "Tell us a little about the occasion and we will find a slot."}
               </p>
               <div className="mt-7">
-                <AppointmentForm />
+                <AppointmentForm piece={piece?.name} />
               </div>
             </div>
           </div>

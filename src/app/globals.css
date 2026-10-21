@@ -182,7 +182,22 @@
     transform: scaleX(1);
   }
 
-  .btn {
+  /*
+   * The base is applied to every variant, not just `.btn`.
+   *
+   * Call sites overwhelmingly write `className="btn-dark"` rather than
+   * `"btn btn-dark"`, so when the base lived on `.btn` alone almost every
+   * button on the site rendered with no padding, no uppercase and no
+   * nowrap -- a coloured box around raw sentence-case text. Attaching the
+   * base to the variants fixes all of them at once and keeps `btn` working
+   * on its own.
+   */
+  .btn,
+  .btn-dark,
+  .btn-light,
+  .btn-gold,
+  .btn-outline,
+  .btn-outline-light {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -198,11 +213,21 @@
     cursor: pointer;
   }
   @media (min-width: 640px) {
-    .btn {
+    .btn,
+  .btn-dark,
+  .btn-light,
+  .btn-gold,
+  .btn-outline,
+  .btn-outline-light {
       font-size: 11px;
     }
   }
-  .btn:disabled {
+  .btn:disabled,
+  .btn-dark:disabled,
+  .btn-light:disabled,
+  .btn-gold:disabled,
+  .btn-outline:disabled,
+  .btn-outline-light:disabled {
     pointer-events: none;
     opacity: 0.5;
   }
@@ -331,10 +356,17 @@
 }
 
 @utility scrim-full {
+  /*
+   * Carries more weight through the middle than it looks like it needs.
+   * The category hero shows whatever still the admin attached, and on a
+   * pale one -- an ivory sherwani, say -- cream type over a 0.3 scrim
+   * disappeared completely. This keeps the heading legible whatever is
+   * behind it.
+   */
   background: linear-gradient(
     to top,
-    rgb(40 22 12 / 0.8) 0%,
-    rgb(40 22 12 / 0.3) 50%,
-    rgb(40 22 12 / 0.45) 100%
+    rgb(40 22 12 / 0.88) 0%,
+    rgb(40 22 12 / 0.58) 50%,
+    rgb(40 22 12 / 0.62) 100%
   );
 }

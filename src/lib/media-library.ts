@@ -59,10 +59,34 @@ export const CLIPS = [
   "IMG_4552_bepygj",
 ] as const;
 
+/**
+ * Menswear shot on the studio floor, 19 Oct 2026.
+ *
+ * Kept separate from STILLS rather than appended to it: `pickStill` indexes
+ * STILLS by position, so growing that array would re-deal every seeded
+ * product's imagery on the next reseed. These are addressed by name instead.
+ *
+ * These are the retouched frames published by `scripts/retouch-studio.ts`,
+ * which is what the site actually renders. The raw phone originals stay in
+ * Cloudinary under `sanskar/` untouched, so a retouch can be redone or undone
+ * without re-uploading anything.
+ */
+export const STUDIO_STILLS = [
+  "sanskar/studio/shikar-olive-linen-bandhgala",
+  "sanskar/studio/moti-bagh-ivory-sherwani",
+  "sanskar/studio/nautch-black-resham-bandhgala",
+  "sanskar/studio/khaki-jaal-tonal-sherwani",
+  "sanskar/studio/baraat-ivory-herringbone-sherwani",
+  "sanskar/studio/zafar-black-jaal-jacket",
+  "sanskar/studio/qaiser-paisley-beaded-jacket",
+  "sanskar/studio/sitara-velvet-bandhgala",
+] as const;
+
 export type AssetKind = "IMAGE" | "VIDEO";
 
 export const ALL_ASSETS: { publicId: string; kind: AssetKind }[] = [
   ...STILLS.map((publicId) => ({ publicId, kind: "IMAGE" as const })),
+  ...STUDIO_STILLS.map((publicId) => ({ publicId, kind: "IMAGE" as const })),
   ...CLIPS.map((publicId) => ({ publicId, kind: "VIDEO" as const })),
 ];
 

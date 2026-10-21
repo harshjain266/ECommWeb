@@ -105,7 +105,9 @@ export default async function AdminDashboard() {
 
       <div className="mt-10 grid gap-8 xl:grid-cols-[1.5fr_1fr]">
         {/* ---- recent orders ---- */}
-        <section className="bg-bone">
+        {/* min-w-0: grid tracks default to min-content, which lets a long
+            order row widen the column past the phone viewport. */}
+        <section className="min-w-0 bg-bone">
           <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
             <h2 className="label text-ink-mute">Recent orders</h2>
             <Link
@@ -157,7 +159,7 @@ export default async function AdminDashboard() {
           )}
         </section>
 
-        <div className="space-y-8">
+        <div className="min-w-0 space-y-8">
           {/* ---- payments ---- */}
           <section className="bg-bone">
             <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">

@@ -20,6 +20,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
 import { MediaPicker, type PickedAsset } from "./MediaPicker";
 import { cn } from "@/lib/utils";
+import { NoImage } from "@/components/ui/NoImage";
 
 export type CatNode = {
   id: string;
@@ -135,7 +136,10 @@ export function CategoryManager({ tree }: { tree: CatNode[] }) {
       <>
         <li
           className={cn(
-            "flex items-center gap-3 border-b border-ink/[0.07] px-4 py-3",
+            // flex-wrap: the action cluster is a fixed 158px and cannot
+            // shrink, so on a narrow phone it wrapped off the right edge.
+            // Letting the row wrap drops it onto its own line instead.
+            "flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-ink/[0.07] px-4 py-3",
             depth > 0 && "bg-bone-warm/40",
           )}
           style={{ paddingLeft: `${16 + depth * 28}px` }}
@@ -191,11 +195,11 @@ export function CategoryManager({ tree }: { tree: CatNode[] }) {
                 sizes="36px"
               />
             ) : (
-              <span className="skeleton block aspect-[3/4]" />
+              <NoImage label="No image" compact className="w-full" />
             )}
           </span>
 
-          <span className="min-w-0 flex-1">
+          <span className="min-w-0 flex-1 basis-40">
             <span className="flex items-center gap-2">
               <span
                 className={cn(
@@ -225,7 +229,7 @@ export function CategoryManager({ tree }: { tree: CatNode[] }) {
             {node.isActive ? "shown" : "hidden"}
           </span>
 
-          <span className="flex shrink-0 items-center gap-0.5">
+          <span className="ml-auto flex shrink-0 items-center gap-0.5">
             {depth === 0 && (
               <button
                 type="button"
@@ -490,7 +494,7 @@ function CategoryDialog({
                   />
                 </div>
               ) : (
-                <div className="skeleton w-24 shrink-0 aspect-[3/4]" />
+                <NoImage label="No image" compact className="w-24 shrink-0" />
               )}
               <div>
                 <p className="break-all font-sans text-[12px] text-ink-mute">

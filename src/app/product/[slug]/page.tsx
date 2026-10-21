@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Mail, Phone } from "lucide-react";
-import { prisma } from "@/lib/db";
+import { getProduct, getRelatedProducts } from "@/lib/catalog-cache";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { AddToCart } from "@/components/product/AddToCart";
 import { ProductAccordion } from "@/components/product/ProductAccordion";
 import { CustomisationDialog } from "@/components/product/CustomisationDialog";
-import { ProductGrid, cardSelect } from "@/components/product/ProductGrid";
+import { ProductGrid } from "@/components/product/ProductGrid";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/site/SectionHead";
 import { imageUrl, videoPosterUrl } from "@/lib/media";
@@ -17,22 +17,9 @@ import { getWishlistIds } from "@/lib/wishlist";
 
 export const revalidate = 60;
 
-const WHATSAPP = "919870196806";
+const WHATSAPP = "97182 82121";
 
 type Params = { slug: string };
-
-async function loadProduct(slug: string) {
-  return prisma.product.findUnique({
-    where: { slug },
-    include: {
-      category: {
-        select: { name: true, slug: true, parent: { select: { name: true, slug: true } } },
-      },
-      media: { orderBy: { position: "asc" } },
-      variants: { orderBy: { position: "asc" } },
-    },
-  });
-}
 
 export async function generateMetadata({
   params,
@@ -40,7 +27,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await loadProduct(slug);
+  const product = await getProduct(slug);
   if (!product) return { title: "Piece not found" };
 
   const hero = product.media[0];
@@ -63,20 +50,11 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const product = await loadProduct(slug);
+  const product = await getProduct(slug);
   if (!product || !product.isActive) notFound();
 
   const [related, wishlist] = await Promise.all([
-    prisma.product.findMany({
-      where: {
-        isActive: true,
-        id: { not: product.id },
-        ...(product.categoryId ? { categoryId: product.categoryId } : {}),
-      },
-      take: 4,
-      orderBy: { position: "asc" },
-      select: cardSelect,
-    }),
+    getRelatedProducts(product.id, product.categoryId),
     getWishlistIds(),
   ]);
 

@@ -224,24 +224,11 @@ export function Header({
               onMouseEnter={cancelClose}
             >
               <div className="shell grid grid-cols-12 gap-8 py-10">
-                {/* "All" — the whole top-level option */}
-                <div className="col-span-2">
-                  <Link
-                    href={`/collections/${active.slug}`}
-                    className="label link-sweep text-ink"
-                  >
-                    All
-                  </Link>
-                  <p className="mt-4 font-sans text-[12px] leading-relaxed text-ink-mute/80">
-                    {active.description}
-                  </p>
-                </div>
-
-                {/* the three grouped columns */}
+                {/* the grouped columns */}
                 {columns.map((col, ci) => (
                   <div
                     key={col.group}
-                    className={columns.length === 3 ? "col-span-2" : "col-span-3"}
+                    className="col-span-3"
                   >
                     <p className="label text-ink-mute/60">{col.label}</p>
                     <ul className="mt-4 space-y-2">
@@ -274,10 +261,9 @@ export function Header({
                     initial={{ opacity: 0, scale: 1.02 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className={cn(
-                      "col-span-4",
-                      columns.length === 3 && "col-span-4",
-                    )}
+                    // Pinned to the right-hand five columns so the tile keeps
+                    // its place whether the menu has one group column or two.
+                    className="col-span-5 col-start-8"
                   >
                     <Link
                       href={`/collections/${active.slug}`}

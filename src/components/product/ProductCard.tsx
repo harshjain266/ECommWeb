@@ -8,6 +8,7 @@ import { CldVideo } from "@/components/ui/CldVideo";
 import { WishlistButton } from "./WishlistButton";
 import { formatINR, discountPercent } from "@/lib/money";
 import { cn } from "@/lib/utils";
+import { NoImage } from "@/components/ui/NoImage";
 
 export type CardProduct = {
   id: string;
@@ -70,8 +71,8 @@ export function ProductCard({
         <WishlistButton productId={product.id} initiallySaved={saved} />
       </div>
 
-      <Link href={`/product/${product.slug}`} className="block">
-        <div className="relative overflow-hidden bg-bone-warm">
+      <div className="relative overflow-hidden bg-bone-warm">
+        <Link href={`/product/${product.slug}`} className="block">
           {/* base still */}
           {primary ? (
             <CldImage
@@ -86,7 +87,7 @@ export function ProductCard({
               )}
             />
           ) : (
-            <div className="skeleton aspect-[3/4]" />
+            <NoImage />
           )}
 
           {/* hover layer, only mounted once hovered so nothing is prefetched */}
@@ -125,13 +126,32 @@ export function ProductCard({
             )}
           </div>
 
-          {/* bottom reveal strip */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-bone/95 px-4 py-3.5 text-center transition-transform duration-500 ease-couture group-hover:translate-y-0">
-            <span className="label text-ink">View the piece</span>
-          </div>
-        </div>
+        </Link>
 
-        <div className="pt-4">
+        {/*
+          The hover actions are siblings of the product anchor, never children
+          of it: a second <a> inside an <a> is invalid HTML and breaks
+          hydration. The wrapper above is the positioning context, so the strip
+          still lands on the image.
+        */}
+        <div className="absolute inset-x-0 bottom-0 flex translate-y-full transition-transform duration-500 ease-couture group-hover:translate-y-0 group-focus-within:translate-y-0">
+          <Link
+            href={`/product/${product.slug}`}
+            className="label flex-1 bg-bone/95 px-3 py-3.5 text-center text-ink transition-colors duration-300 hover:bg-bone"
+          >
+            View
+          </Link>
+          <Link
+            href={`/atelier?piece=${encodeURIComponent(product.slug)}`}
+            className="label flex-1 bg-ink px-3 py-3.5 text-center text-bone transition-colors duration-300 hover:bg-oxblood"
+          >
+            Book a fitting
+          </Link>
+        </div>
+      </div>
+
+      <Link href={`/product/${product.slug}`} className="block pt-4">
+        <div>
           {product.category && (
             <p className="label text-ink-mute/60">{product.category.name}</p>
           )}

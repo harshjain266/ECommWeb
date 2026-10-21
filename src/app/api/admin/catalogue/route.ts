@@ -64,6 +64,29 @@ const body = z.discriminatedUnion("op", [
   deleteVariantSchema,
 ]);
 
+/**
+ * The next free reference in the house's SK-0001 numbering.
+ *
+ * Counting products would be wrong -- deleting one would hand the next
+ * quick-add a number that is still in use -- so this reads the highest
+ * number actually issued and walks forward from there.
+ */
+async function nextSku(): Promise<string> {
+  const issued = await prisma.product.findMany({ select: { sku: true } });
+  const taken = new Set(issued.map((p) => p.sku));
+
+  let highest = 0;
+  for (const { sku } of issued) {
+    const m = /^SK-(\d+)$/.exec(sku);
+    if (m) highest = Math.max(highest, Number(m[1]));
+  }
+
+  for (let n = highest + 1; ; n++) {
+    const candidate = `SK-${String(n).padStart(4, "0")}`;
+    if (!taken.has(candidate)) return candidate;
+  }
+}
+
 const SIZE_PRESETS: Record<string, { size: string; stock: number }[]> = {
   WOMEN: [
     { size: "XS", stock: 0 },
@@ -187,9 +210,32 @@ export const POST = withAdmin(async (req) => {
     slug = `${base}-${n}`;
   }
 
-  const sku =
-    data.sku?.trim() ||
-    `SK-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  /*
+   * The reference needs the same uniqueness care as the slug above.
+   *
+   * It did not have it: whatever the admin typed went straight into a column
+   * with a unique index, so picking a number that happened to be taken came
+   * back as a raw Prisma stack trace and a 500. And left blank it generated
+   * `SK-<base36 timestamp>`, which does not look like the SK-0001 numbering
+   * the rest of the catalogue uses.
+   */
+  const typed = data.sku?.trim();
+  if (typed) {
+    const clash = await prisma.product.findUnique({
+      where: { sku: typed },
+      select: { name: true },
+    });
+    if (clash) {
+      return NextResponse.json(
+        {
+          error: `Reference ${typed} already belongs to "${clash.name}". Leave it blank to have the next one assigned.`,
+          fields: { sku: "Already in use" },
+        },
+        { status: 422 },
+      );
+    }
+  }
+  const sku = typed || (await nextSku());
 
   const last = await prisma.product.findFirst({
     where: { categoryId: data.categoryId },

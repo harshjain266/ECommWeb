@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle, X, Send } from "lucide-react";
 
-const WHATSAPP = "919870196806";
+const WHATSAPP = "97182 82121";
 
 const PROMPTS = [
   "What are your bridal lead times?",
@@ -38,7 +38,7 @@ export function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-24 right-5 z-[115] w-[min(340px,calc(100vw-2.5rem))] overflow-hidden bg-bone shadow-2xl"
+            className="fixed bottom-20 right-4 z-[115] max-h-[min(70vh,520px)] w-[min(340px,calc(100vw-2rem))] overflow-hidden bg-bone shadow-2xl sm:bottom-24 sm:right-5"
           >
             <div className="bg-ink px-5 py-4 text-bone">
               <p className="label text-gold-light">Talk to the atelier</p>
@@ -99,7 +99,8 @@ export function ChatWidget() {
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close chat" : "Chat with the atelier"}
         aria-expanded={open}
-        className="fixed bottom-5 right-5 z-[116] flex h-12 w-12 items-center justify-center rounded-full bg-ink text-bone shadow-xl transition-transform duration-300 hover:scale-105"
+        className="fixed bottom-4 right-4 z-[116] flex h-11 w-11 items-center justify-center rounded-full bg-ink text-bone shadow-xl transition-transform duration-300 hover:scale-105 sm:bottom-5 sm:right-5 sm:h-12 sm:w-12"
+        style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
       >
         {open ? (
           <X className="h-5 w-5" strokeWidth={1.5} />

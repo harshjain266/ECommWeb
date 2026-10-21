@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/db";
+import { getHomeData } from "@/lib/catalog-cache";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { Hero, type HeroSlide } from "@/components/site/Hero";
 import { Marquee } from "@/components/site/Marquee";
@@ -10,59 +10,19 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { EditorialSplit } from "@/components/site/EditorialSplit";
 import { CraftStats } from "@/components/site/CraftStats";
 import { SectionHead } from "@/components/site/SectionHead";
-import { ProductGrid, cardSelect } from "@/components/product/ProductGrid";
+import { ProductGrid } from "@/components/product/ProductGrid";
 import { ExploreButton } from "@/components/ui/ExploreButton";
 import { getWishlistIds } from "@/lib/wishlist";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
+  // One cached read for everything shared, plus the one thing that is not:
+  // the wishlist is per-visitor and must never enter a shared cache.
   const [
-    heroBanners,
-    editorials,
-    diwali,
-    featured,
-    newArrivals,
-    testimonials,
-    clipRows,
+    { heroBanners, editorials, diwali, featured, newArrivals, testimonials, clipRows },
     wishlist,
-  ] = await Promise.all([
-    prisma.banner.findMany({
-      where: { slot: "HERO", isActive: true },
-      orderBy: { position: "asc" },
-    }),
-    prisma.banner.findMany({
-      where: { slot: "EDITORIAL", isActive: true },
-      orderBy: { position: "asc" },
-    }),
-    prisma.banner.findMany({
-      where: { slot: "DIWALI", isActive: true },
-      orderBy: { position: "asc" },
-    }),
-    prisma.product.findMany({
-      where: { isActive: true, isFeatured: true },
-      orderBy: { position: "asc" },
-      take: 8,
-      select: cardSelect,
-    }),
-    prisma.product.findMany({
-      where: { isActive: true, isNewArrival: true },
-      orderBy: { createdAt: "desc" },
-      take: 4,
-      select: cardSelect,
-    }),
-    prisma.testimonial.findMany({
-      where: { isActive: true },
-      orderBy: { position: "asc" },
-    }),
-    prisma.productMedia.findMany({
-      where: { kind: "VIDEO" },
-      orderBy: { id: "asc" },
-      take: 14,
-      select: { publicId: true },
-    }),
-    getWishlistIds(),
-  ]);
+  ] = await Promise.all([getHomeData(), getWishlistIds()]);
 
   const slides: HeroSlide[] = heroBanners.map((b) => ({
     id: b.id,

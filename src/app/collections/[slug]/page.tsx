@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/db";
+import { getCategory, getCategoryProducts } from "@/lib/catalog-cache";
 import { SiteChrome } from "@/components/site/SiteChrome";
-import { ProductGrid, cardSelect } from "@/components/product/ProductGrid";
+import { ProductGrid } from "@/components/product/ProductGrid";
 import { CldImage } from "@/components/ui/CldImage";
 import { Reveal, RevealWords } from "@/components/ui/Reveal";
 import { CollectionToolbar, type SortKey } from "@/components/product/CollectionToolbar";
@@ -15,34 +14,13 @@ export const revalidate = 60;
 type Params = { slug: string };
 type Search = { sort?: string; min?: string; max?: string };
 
-async function loadCategory(slug: string) {
-  return prisma.category.findUnique({
-    where: { slug },
-    include: {
-      parent: { select: { name: true, slug: true } },
-      children: {
-        where: { isActive: true },
-        orderBy: { position: "asc" },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          imageId: true,
-          menuGroup: true,
-        },
-      },
-    },
-  });
-}
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const category = await loadCategory(slug);
+  const category = await getCategory(slug);
   if (!category) return { title: "Collection not found" };
   return {
     title: category.name,
@@ -50,11 +28,13 @@ export async function generateMetadata({
   };
 }
 
-const SORTS: Record<SortKey, Prisma.ProductOrderByWithRelationInput> = {
-  featured: { position: "asc" },
-  newest: { createdAt: "desc" },
-  "price-asc": { price: "asc" },
-  "price-desc": { price: "desc" },
+type SortableCard = { position: number; createdAt: Date; price: number };
+
+const SORTS: Record<SortKey, (a: SortableCard, b: SortableCard) => number> = {
+  featured: (a, b) => a.position - b.position,
+  newest: (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+  "price-asc": (a, b) => a.price - b.price,
+  "price-desc": (a, b) => b.price - a.price,
 };
 
 export default async function CollectionPage({
@@ -67,7 +47,7 @@ export default async function CollectionPage({
   const { slug } = await params;
   const { sort, min, max } = await searchParams;
 
-  const category = await loadCategory(slug);
+  const category = await getCategory(slug);
   if (!category || !category.isActive) notFound();
 
   const sortKey: SortKey = (
@@ -81,27 +61,29 @@ export default async function CollectionPage({
     ? category.children.map((c) => c.id)
     : [category.id];
 
-  const priceFilter: Prisma.IntFilter = {};
-  if (min && Number.isFinite(Number(min))) priceFilter.gte = Number(min) * 100;
-  if (max && Number.isFinite(Number(max))) priceFilter.lte = Number(max) * 100;
-
-  const [products, priceRange, wishlist] = await Promise.all([
-    prisma.product.findMany({
-      where: {
-        isActive: true,
-        categoryId: { in: categoryIds },
-        ...(Object.keys(priceFilter).length ? { price: priceFilter } : {}),
-      },
-      orderBy: SORTS[sortKey],
-      select: cardSelect,
-    }),
-    prisma.product.aggregate({
-      where: { isActive: true, categoryId: { in: categoryIds } },
-      _min: { price: true },
-      _max: { price: true },
-    }),
+  // One cached read for the shelf, then sort and filter in memory. A round
+  // trip to the database costs far more than sorting a few dozen rows, and
+  // this way the cache holds one entry per shelf rather than one per
+  // combination of sort order and price range.
+  const [all, wishlist] = await Promise.all([
+    getCategoryProducts(categoryIds),
     getWishlistIds(),
   ]);
+
+  const prices = all.map((p) => p.price);
+  const floor = prices.length ? Math.min(...prices) : 0;
+  const ceiling = prices.length ? Math.max(...prices) : 0;
+
+  const minPaise = min && Number.isFinite(Number(min)) ? Number(min) * 100 : null;
+  const maxPaise = max && Number.isFinite(Number(max)) ? Number(max) * 100 : null;
+
+  const products = all
+    .filter(
+      (p) =>
+        (minPaise === null || p.price >= minPaise) &&
+        (maxPaise === null || p.price <= maxPaise),
+    )
+    .sort(SORTS[sortKey]);
 
   return (
     <SiteChrome>
@@ -205,8 +187,8 @@ export default async function CollectionPage({
             sort={sortKey}
             min={min}
             max={max}
-            floor={Math.floor((priceRange._min.price ?? 0) / 100)}
-            ceiling={Math.ceil((priceRange._max.price ?? 0) / 100)}
+            floor={Math.floor(floor / 100)}
+            ceiling={Math.ceil(ceiling / 100)}
           />
           <div className="mt-12">
             <ProductGrid products={products} wishlist={wishlist} />

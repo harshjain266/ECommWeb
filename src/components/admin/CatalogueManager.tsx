@@ -22,6 +22,7 @@ import { useToast } from "@/components/ui/Toast";
 import { MediaPicker, type PickedAsset } from "./MediaPicker";
 import { formatINR } from "@/lib/money";
 import { cn } from "@/lib/utils";
+import { NoImage } from "@/components/ui/NoImage";
 
 type Variant = { id: string; size: string; stock: number };
 
@@ -189,9 +190,11 @@ export function CatalogueManager({
   }
 
   return (
-    <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
+    // minmax(0,1fr) rather than 1fr: a 1fr track floors at min-content, so a
+    // wide item row widens the grid past a phone viewport instead of shrinking.
+    <div className="mt-8 grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
       {/* ================= categories ================= */}
-      <aside className="bg-bone">
+      <aside className="min-w-0 bg-bone">
         <div className="flex items-center justify-between border-b border-ink/10 px-4 py-4">
           <h2 className="label text-ink-mute">Categories</h2>
           <Link href="/admin/categories" className="label link-sweep text-ink-mute/70">
@@ -230,14 +233,14 @@ export function CatalogueManager({
                     type="button"
                     onClick={() => select(top.id)}
                     className={cn(
-                      "flex-1 py-2.5 pr-3 text-left font-sans text-[13px] transition-colors",
+                      "flex min-w-0 flex-1 items-center justify-between gap-2 py-2.5 pr-3 text-left font-sans text-[13px] transition-colors",
                       selected?.id === top.id
                         ? "text-ink"
                         : "text-ink-mute hover:text-ink",
                     )}
                   >
-                    {top.name}
-                    <span className="label ml-2 text-ink-mute/40">
+                    <span className="truncate">{top.name}</span>
+                    <span className="label shrink-0 text-ink-mute/40">
                       {top.productCount}
                     </span>
                   </button>
@@ -288,7 +291,7 @@ export function CatalogueManager({
       </aside>
 
       {/* ================= pieces ================= */}
-      <section className="bg-bone">
+      <section className="min-w-0 bg-bone">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/10 px-5 py-4">
           <div>
             <h2 className="font-display text-[22px] font-light text-ink">
@@ -433,7 +436,7 @@ function ProductRow({
               fromVideo={row.image.kind === "VIDEO"}
             />
           ) : (
-            <span className="skeleton block aspect-[3/4]" />
+            <NoImage label="No image" compact className="w-full" />
           )}
         </span>
 
@@ -716,7 +719,15 @@ function QuickAddDialog({
                     SKU{" "}
                     <span className="normal-case tracking-normal">(auto)</span>
                   </label>
-                  <input id="qa-sku" name="sku" className="field" />
+                  {/* The label already says "(auto)", but the box looked
+                      like a required field, so references were being typed
+                      in by hand and colliding. */}
+                  <input
+                    id="qa-sku"
+                    name="sku"
+                    className="field"
+                    placeholder="Leave blank — next one is assigned"
+                  />
                 </div>
               </div>
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { PageHead } from "@/components/admin/PageHead";
 import { CldImage } from "@/components/ui/CldImage";
+import { NoImage } from "@/components/ui/NoImage";
 import { formatINR } from "@/lib/money";
 import { ProductRowActions } from "@/components/admin/ProductRowActions";
 
@@ -97,7 +98,7 @@ export default async function AdminProducts({
                             fromVideo={p.media[0].kind === "VIDEO"}
                           />
                         ) : (
-                          <span className="skeleton block aspect-[3/4]" />
+                          <NoImage label="No image" compact className="w-full" />
                         )}
                       </span>
                       <span className="min-w-0">

@@ -9,7 +9,7 @@
  *
  *   npm run media:warm
  */
-import { STILLS, CLIPS } from "../src/lib/media-library";
+import { STILLS, STUDIO_STILLS, CLIPS } from "../src/lib/media-library";
 import { imageUrl, videoUrl, videoPosterUrl, blurUrl, blurUrlFor } from "../src/lib/media";
 
 /** Must stay in step with the widths the components actually ask for. */
@@ -22,7 +22,7 @@ type Job = { label: string; url: string };
 
 const jobs: Job[] = [];
 
-for (const id of STILLS) {
+for (const id of [...STILLS, ...STUDIO_STILLS]) {
   jobs.push({ label: `${id} blur`, url: blurUrl(id) });
   for (const w of IMAGE_WIDTHS) {
     jobs.push({ label: `${id} w${w}`, url: imageUrl(id, { width: w }) });

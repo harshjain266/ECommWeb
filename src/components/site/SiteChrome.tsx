@@ -1,4 +1,4 @@
-import { getNav } from "@/lib/nav";
+import { getNav } from "@/lib/catalog-cache";
 import { getCartView } from "@/lib/cart";
 import { getSession } from "@/lib/session";
 import { getWishlistCount } from "@/lib/wishlist";

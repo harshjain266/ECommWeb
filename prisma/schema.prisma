@@ -317,3 +317,38 @@ model Payment {
 
   @@index([status])
 }
+
+/// Status of a consultation request as the atelier works through it.
+enum AppointmentStatus {
+  NEW
+  CONTACTED
+  SCHEDULED
+  CLOSED
+}
+
+/// A "Book a fitting" / "Request an appointment" enquiry.
+///
+/// Persisted before any notification is attempted, deliberately: email is the
+/// part most likely to fail (missing key, provider outage, bounced domain),
+/// and a consultation request that reaches nobody is a lost customer. The row
+/// is the record of truth; the email is only the nudge.
+model Appointment {
+  id        String            @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  occasion  String?
+  date      String?
+  message   String?
+  /// Name of the piece the visitor was looking at, when they came from a card.
+  piece     String?
+  status    AppointmentStatus @default(NEW)
+  /// Whether the atelier notification actually went out.
+  notified  Boolean           @default(false)
+  /// Why the notification failed, when it did -- surfaced in the admin list.
+  notifyError String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([status, createdAt])
+}

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/db";
+import { getAllProducts } from "@/lib/catalog-cache";
 import { SiteChrome } from "@/components/site/SiteChrome";
-import { ProductGrid, cardSelect } from "@/components/product/ProductGrid";
+import { ProductGrid } from "@/components/product/ProductGrid";
 import { CollectionToolbar, type SortKey } from "@/components/product/CollectionToolbar";
 import { getWishlistIds } from "@/lib/wishlist";
 import { cn } from "@/lib/utils";
@@ -16,11 +15,13 @@ export const dynamic = "force-dynamic";
 
 const PER_PAGE = 12;
 
-const SORTS: Record<SortKey, Prisma.ProductOrderByWithRelationInput> = {
-  featured: { position: "asc" },
-  newest: { createdAt: "desc" },
-  "price-asc": { price: "asc" },
-  "price-desc": { price: "desc" },
+type SortableCard = { position: number; createdAt: Date; price: number };
+
+const SORTS: Record<SortKey, (a: SortableCard, b: SortableCard) => number> = {
+  featured: (a, b) => a.position - b.position,
+  newest: (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+  "price-asc": (a, b) => a.price - b.price,
+  "price-desc": (a, b) => b.price - a.price,
 };
 
 export default async function AllDesignsPage({
@@ -38,31 +39,25 @@ export default async function AllDesignsPage({
 
   const current = Math.max(1, Number(page) || 1);
 
-  const priceFilter: Prisma.IntFilter = {};
-  if (min && Number.isFinite(Number(min))) priceFilter.gte = Number(min) * 100;
-  if (max && Number.isFinite(Number(max))) priceFilter.lte = Number(max) * 100;
+  const [all, wishlist] = await Promise.all([getAllProducts(), getWishlistIds()]);
 
-  const where: Prisma.ProductWhereInput = {
-    isActive: true,
-    ...(Object.keys(priceFilter).length ? { price: priceFilter } : {}),
-  };
+  const prices = all.map((p) => p.price);
+  const floor = prices.length ? Math.min(...prices) : 0;
+  const ceiling = prices.length ? Math.max(...prices) : 0;
 
-  const [products, total, range, wishlist] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      orderBy: SORTS[sortKey],
-      skip: (current - 1) * PER_PAGE,
-      take: PER_PAGE,
-      select: cardSelect,
-    }),
-    prisma.product.count({ where }),
-    prisma.product.aggregate({
-      where: { isActive: true },
-      _min: { price: true },
-      _max: { price: true },
-    }),
-    getWishlistIds(),
-  ]);
+  const minPaise = min && Number.isFinite(Number(min)) ? Number(min) * 100 : null;
+  const maxPaise = max && Number.isFinite(Number(max)) ? Number(max) * 100 : null;
+
+  const matched = all
+    .filter(
+      (p) =>
+        (minPaise === null || p.price >= minPaise) &&
+        (maxPaise === null || p.price <= maxPaise),
+    )
+    .sort(SORTS[sortKey]);
+
+  const total = matched.length;
+  const products = matched.slice((current - 1) * PER_PAGE, current * PER_PAGE);
 
   const pages = Math.max(1, Math.ceil(total / PER_PAGE));
 
@@ -100,8 +95,8 @@ export default async function AllDesignsPage({
             sort={sortKey}
             min={min}
             max={max}
-            floor={Math.floor((range._min.price ?? 0) / 100)}
-            ceiling={Math.ceil((range._max.price ?? 0) / 100)}
+            floor={Math.floor(floor / 100)}
+            ceiling={Math.ceil(ceiling / 100)}
           />
         </div>
 

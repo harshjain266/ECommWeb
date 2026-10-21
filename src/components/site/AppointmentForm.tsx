@@ -14,7 +14,13 @@ const OCCASIONS = [
   "Something else",
 ];
 
-export function AppointmentForm() {
+/**
+ * `piece` arrives from the "Book a fitting" action on a product card, via
+ * `/atelier?piece=<slug>`. It is shown back to the visitor and sent with the
+ * request so the atelier knows which piece prompted the enquiry rather than
+ * having to ask.
+ */
+export function AppointmentForm({ piece }: { piece?: string | null }) {
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +69,14 @@ export function AppointmentForm() {
 
   return (
     <form onSubmit={submit} className="space-y-5" noValidate>
+      {piece && (
+        <div className="border-l-2 border-gold bg-gold/10 px-4 py-3">
+          <p className="label text-ink-mute/70">Enquiring about</p>
+          <p className="mt-1 font-display text-[17px] font-light text-ink">{piece}</p>
+          <input type="hidden" name="piece" value={piece} />
+        </div>
+      )}
+
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="a-name" className="field-label">
@@ -100,7 +114,12 @@ export function AppointmentForm() {
           <label htmlFor="a-occasion" className="field-label">
             What for
           </label>
-          <select id="a-occasion" name="occasion" className="field">
+          <select
+            id="a-occasion"
+            name="occasion"
+            defaultValue={piece ? "Groom commission" : OCCASIONS[0]}
+            className="field"
+          >
             {OCCASIONS.map((o) => (
               <option key={o} value={o}>
                 {o}

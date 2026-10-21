@@ -30,7 +30,16 @@ export const GROUP_LABELS: Record<MenuGroup, string> = {
   COLLECTION: "Shop By Collection",
 };
 
-export const GROUP_ORDER: MenuGroup[] = ["OCCASION", "CATEGORY", "COLLECTION"];
+/**
+ * Which columns the menu actually renders, in order.
+ *
+ * COLLECTION is deliberately absent: the house asked for the "Shop By
+ * Collection" column to come out of the menu. The group itself is kept (the
+ * type, the label, the stored values) so categories already tagged COLLECTION
+ * keep their tag and stay reachable at their own URLs -- they simply no
+ * longer get a column. Put "COLLECTION" back in this array to restore it.
+ */
+export const GROUP_ORDER: MenuGroup[] = ["OCCASION", "CATEGORY"];
 
 /** Split a nav item's children into the three mega-menu columns. */
 export function groupChildren(children: NavChild[]) {
