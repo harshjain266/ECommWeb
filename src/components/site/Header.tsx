@@ -223,13 +223,10 @@ export function Header({
               className="absolute inset-x-0 top-full hidden border-t border-ink/10 bg-bone/98 backdrop-blur-xl lg:block"
               onMouseEnter={cancelClose}
             >
-              <div className="shell grid grid-cols-12 gap-8 py-10">
+              <div className="shell flex items-start gap-10 py-10">
                 {/* the grouped columns */}
                 {columns.map((col, ci) => (
-                  <div
-                    key={col.group}
-                    className="col-span-3"
-                  >
+                  <div key={col.group} className="w-52 shrink-0">
                     <p className="label text-ink-mute/60">{col.label}</p>
                     <ul className="mt-4 space-y-2">
                       {col.items.map((child, i) => (
@@ -261,9 +258,7 @@ export function Header({
                     initial={{ opacity: 0, scale: 1.02 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    // Pinned to the right-hand five columns so the tile keeps
-                    // its place whether the menu has one group column or two.
-                    className="col-span-5 col-start-8"
+                    className="ml-auto w-[clamp(300px,32vw,520px)] shrink-0"
                   >
                     <Link
                       href={`/collections/${active.slug}`}
@@ -271,10 +266,15 @@ export function Header({
                     >
                       <CldImage
                         publicId={active.imageId}
+                        fromVideo={active.imageKind === "VIDEO"}
                         alt={active.name}
-                        ratio="16/9"
-                        sizes="420px"
-                        widths={[400, 640]}
+                        ratio="4/3"
+                        // The shelf art is portrait studio photography; a
+                        // centred crop into a landscape box cuts the head and
+                        // the collar off, which is the half worth seeing.
+                        focus="center 22%"
+                        sizes="(min-width:1024px) 32vw, 420px"
+                        widths={[400, 640, 800]}
                         imgClassName="transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
                       />
                       <span className="label mt-3 flex items-center gap-1.5 text-ink-mute">

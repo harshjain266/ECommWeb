@@ -5,6 +5,7 @@ import { getCategory, getCategoryProducts } from "@/lib/catalog-cache";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { CldImage } from "@/components/ui/CldImage";
+import { CldVideo } from "@/components/ui/CldVideo";
 import { Reveal, RevealWords } from "@/components/ui/Reveal";
 import { CollectionToolbar, type SortKey } from "@/components/product/CollectionToolbar";
 import { getWishlistIds } from "@/lib/wishlist";
@@ -91,14 +92,25 @@ export default async function CollectionPage({
       <section className="relative bg-ink">
         {category.imageId && (
           <>
-            <CldImage
-              publicId={category.imageId}
-              alt={category.name}
-              priority
-              sizes="100vw"
-              className="absolute inset-0 h-full w-full"
-              imgClassName="opacity-45"
-            />
+            {category.imageKind === "VIDEO" ? (
+              <CldVideo
+                publicId={category.imageId}
+                width={1920}
+                priority
+                lazy={false}
+                className="absolute inset-0 h-full w-full"
+                videoClassName="opacity-45"
+              />
+            ) : (
+              <CldImage
+                publicId={category.imageId}
+                alt={category.name}
+                priority
+                sizes="100vw"
+                className="absolute inset-0 h-full w-full"
+                imgClassName="opacity-45"
+              />
+            )}
             <div className="absolute inset-0 scrim-full" />
           </>
         )}
@@ -155,6 +167,10 @@ export default async function CollectionPage({
                     <div className="overflow-hidden">
                       <CldImage
                         publicId={child.imageId}
+                        // A shelf whose art is a clip still needs a still
+                        // here -- asking Cloudinary for a video id down the
+                        // image route 404s, and the tile comes back blank.
+                        fromVideo={child.imageKind === "VIDEO"}
                         alt={child.name}
                         ratio="4/5"
                         sizes="(min-width:1024px) 17vw, 50vw"

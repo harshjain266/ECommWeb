@@ -14,6 +14,15 @@ type Props = {
   priority?: boolean;
   /** Treat the id as a video and use its first frame. */
   fromVideo?: boolean;
+  /**
+   * Where to anchor the crop, as a CSS `object-position`.
+   *
+   * The image is cropped by `object-cover`, which centres by default. Put a
+   * portrait studio shot in a wide box and the centre band is the model's
+   * midriff -- the head and the collar, which is what the piece is actually
+   * about, fall outside. Pass "top" (or a value like "center 25%") for those.
+   */
+  focus?: string;
   grayscale?: boolean;
 };
 
@@ -37,6 +46,7 @@ export function CldImage({
   imgClassName,
   priority = false,
   fromVideo = false,
+  focus,
   grayscale = false,
 }: Props) {
   if (!publicId) {
@@ -78,6 +88,7 @@ export function CldImage({
         decoding={priority ? "sync" : "async"}
         fetchPriority={priority ? "high" : "auto"}
         className={cn("h-full w-full object-cover", imgClassName)}
+        style={focus ? { objectPosition: focus } : undefined}
       />
     </div>
   );

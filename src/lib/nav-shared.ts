@@ -20,6 +20,7 @@ export type NavItem = {
   description: string | null;
   featured: boolean;
   imageId: string | null;
+  imageKind: "IMAGE" | "VIDEO";
   children: NavChild[];
 };
 

@@ -31,6 +31,7 @@ export const POST = withAdmin(async (req) => {
       description: d.description || null,
       parentId: d.parentId || null,
       imageId: d.imageId || null,
+      imageKind: d.imageKind,
       position: d.position,
       isActive: d.isActive,
       featured: d.featured,

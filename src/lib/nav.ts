@@ -22,6 +22,7 @@ export async function getNav(): Promise<NavItem[]> {
       description: true,
       featured: true,
       imageId: true,
+      imageKind: true,
       children: {
         where: { isActive: true },
         orderBy: { position: "asc" },

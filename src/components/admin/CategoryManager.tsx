@@ -28,6 +28,7 @@ export type CatNode = {
   slug: string;
   description: string;
   imageId: string;
+  imageKind: "IMAGE" | "VIDEO";
   position: number;
   isActive: boolean;
   featured: boolean;
@@ -114,6 +115,7 @@ export function CategoryManager({ tree }: { tree: CatNode[] }) {
     slug: "",
     description: "",
     imageId: "",
+    imageKind: "IMAGE",
     position: 0,
     isActive: true,
     featured: false,
@@ -189,6 +191,7 @@ export function CategoryManager({ tree }: { tree: CatNode[] }) {
             {node.imageId ? (
               <CldImage
                 publicId={node.imageId}
+                fromVideo={node.imageKind === "VIDEO"}
                 alt={node.name}
                 ratio="3/4"
                 widths={[120]}
@@ -487,6 +490,7 @@ function CategoryDialog({
                 <div className="w-24 shrink-0">
                   <CldImage
                     publicId={v.imageId}
+                    fromVideo={v.imageKind === "VIDEO"}
                     alt={v.name || v.imageId}
                     ratio="3/4"
                     widths={[200]}
@@ -512,7 +516,10 @@ function CategoryDialog({
                   {v.imageId && (
                     <button
                       type="button"
-                      onClick={() => set("imageId", "")}
+                      onClick={() => {
+                        set("imageId", "");
+                        set("imageKind", "IMAGE");
+                      }}
                       className="label px-3 text-ink-mute hover:text-oxblood"
                     >
                       Clear
@@ -582,7 +589,10 @@ function CategoryDialog({
           open={pickerOpen}
           onClose={() => setPickerOpen(false)}
           onPick={(assets: PickedAsset[]) => {
-            if (assets[0]) set("imageId", assets[0].publicId);
+            if (assets[0]) {
+              set("imageId", assets[0].publicId);
+              set("imageKind", assets[0].kind);
+            }
           }}
           selected={v.imageId ? [v.imageId] : []}
         />

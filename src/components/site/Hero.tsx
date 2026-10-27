@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { CldVideo } from "@/components/ui/CldVideo";
 import { CldImage } from "@/components/ui/CldImage";
 
@@ -87,40 +86,32 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                 exit={{ opacity: 0, y: -14 }}
                 transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
               >
-                {slide.eyebrow && (
-                  <p className="label mb-5 flex items-center gap-3 text-gold-light">
-                    <span className="h-px w-10 bg-gold-light/60" aria-hidden />
-                    {slide.eyebrow}
-                  </p>
-                )}
-
-                <h1 className="display text-[clamp(3.2rem,11vw,8.5rem)] text-bone">
+                {/*
+                  The house asked for the hero copy to come off the film, so
+                  the eyebrow, title and standfirst are gone. The heading is
+                  kept for screen readers and search engines only -- a page
+                  with no h1 at all reads as untitled to both, and losing that
+                  was not part of the request.
+                */}
+                <h1 className="sr-only">
+                  {slide.eyebrow ? `${slide.eyebrow} — ` : ""}
                   {slide.title}
+                  {slide.subtitle ? `. ${slide.subtitle}` : ""}
                 </h1>
 
-                {slide.subtitle && (
-                  <p className="mt-6 max-w-lg text-pretty font-sans text-[15px] leading-relaxed text-bone/70 sm:text-base">
-                    {slide.subtitle}
-                  </p>
-                )}
-
-                {slide.ctaHref && slide.ctaLabel && (
-                  <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-                    <Link href={slide.ctaHref} className="btn-light group w-full sm:w-auto">
-                      {slide.ctaLabel}
-                      <ArrowRight
-                        className="h-3.5 w-3.5 transition-transform duration-500 group-hover:translate-x-1"
-                        strokeWidth={1.5}
-                      />
-                    </Link>
-                    <Link
-                      href="/atelier"
-                      className="btn-outline-light w-full sm:w-auto"
-                    >
-                      Book an appointment
-                    </Link>
-                  </div>
-                )}
+                {/*
+                  Only the appointment CTA remains: the house asked for the
+                  "Explore" link to come off as well, so the film now carries
+                  a single invitation rather than two competing ones.
+                */}
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                  <Link
+                    href="/atelier"
+                    className="btn-outline-light w-full sm:w-auto"
+                  >
+                    Book an appointment
+                  </Link>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>

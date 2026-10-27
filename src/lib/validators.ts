@@ -92,6 +92,8 @@ export const categorySchema = z.object({
   description: z.string().max(400).optional().or(z.literal("")),
   parentId: z.string().optional().nullable(),
   imageId: z.string().optional().or(z.literal("")),
+  /** Whether `imageId` is a still or a clip. Shelves accept both. */
+  imageKind: z.enum(["IMAGE", "VIDEO"]).default("IMAGE"),
   position: z.coerce.number().int().min(0).default(0),
   isActive: z.coerce.boolean().default(true),
   featured: z.coerce.boolean().default(false),

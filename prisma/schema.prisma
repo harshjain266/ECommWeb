@@ -80,6 +80,10 @@ model Category {
   parentId    String?
   /// Cloudinary publicId used as the mega-menu / collection hero art
   imageId     String?
+  /// Whether `imageId` points at a still or a clip. Homepage banners have
+  /// carried this since the start; shelves only ever took stills, so the
+  /// default keeps every existing row behaving exactly as before.
+  imageKind   MediaKind @default(IMAGE)
   position    Int     @default(0)
   isActive    Boolean @default(true)
   /// Render this top-level item highlighted in the nav (e.g. "Bridal")

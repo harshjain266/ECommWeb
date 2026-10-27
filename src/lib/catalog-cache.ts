@@ -76,6 +76,7 @@ async function readCategory(slug: string) {
           slug: true,
           description: true,
           imageId: true,
+          imageKind: true,
           menuGroup: true,
         },
       },
