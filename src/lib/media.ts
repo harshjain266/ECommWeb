@@ -89,6 +89,8 @@ export type VideoOpts = {
   width?: number;
   height?: number;
   crop?: Crop;
+  /** Only "auto" is unavailable here -- see `videoUrl`. */
+  gravity?: Exclude<Gravity, "auto">;
   quality?: number | "auto";
   /** Drop the audio track -- autoplaying loops must be silent anyway. */
   mute?: boolean;
@@ -103,7 +105,11 @@ export function videoUrl(publicId: string, opts: VideoOpts = {}): string {
   if (opts.height) t.push(`h_${Math.round(opts.height)}`);
   if (opts.crop) t.push(`c_${opts.crop}`);
   else if (opts.width && opts.height) t.push("c_fill");
-  if (opts.width && opts.height) t.push("g_auto");
+  // No `g_auto` here, unlike the image builder: Cloudinary rejects it on the
+  // video pipeline -- "g_auto must be in a transformation component by
+  // itself" -- and returns 400, so asking for both a width and a height used
+  // to produce a broken clip rather than a cropped one.
+  if (opts.width && opts.height) t.push(`g_${opts.gravity ?? "center"}`);
   // vc_h264 is the widest-support codec; mp4 container keeps Safari happy too.
   t.push("vc_h264");
   if (opts.mute) t.push("ac_none");

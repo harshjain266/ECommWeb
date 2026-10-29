@@ -163,7 +163,7 @@ export function AppointmentForm({ piece }: { piece?: string | null }) {
       </button>
 
       <p className="font-sans text-[11px] leading-relaxed text-ink-mute/70">
-        Consultations run Tuesday to Saturday, 11am to 7pm, at our Shahpur Jat
+        Consultations run Tuesday to Saturday, 11am to 7pm, at our Chanakyapuri
         studio. Bridal slots for a given season usually close nine months ahead.
       </p>
     </form>

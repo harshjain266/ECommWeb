@@ -112,7 +112,7 @@ export function Header({
             {/* keeps the wordmark optically centred on desktop */}
             <div className="hidden flex-1 lg:block" />
 
-            <Wordmark />
+            <Wordmark tone={light ? "bone" : "ink"} layout="stack" />
 
             <div className="flex flex-1 items-center justify-end gap-0.5 sm:gap-1">
               <button
@@ -328,7 +328,7 @@ function MobileNav({
         className="absolute inset-y-0 left-0 flex w-[90%] max-w-sm flex-col bg-bone"
       >
         <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
-          <Wordmark size="sm" />
+          <Wordmark size="sm" tone="ink" layout="stack" />
           <button type="button" onClick={onClose} aria-label="Close menu" className="p-1">
             <X className="h-5 w-5" strokeWidth={1.25} />
           </button>

@@ -77,7 +77,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
       {/* ---- copy ---- */}
       <div className="absolute inset-0 flex items-end pb-24 sm:pb-28 lg:items-center lg:pb-0">
         <div className="shell w-full">
-          <div className="max-w-2xl">
+          <div className="mx-auto max-w-2xl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`copy-${slide.id}`}
@@ -104,7 +104,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                   "Explore" link to come off as well, so the film now carries
                   a single invitation rather than two competing ones.
                 */}
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <div className="flex justify-center">
                   <Link
                     href="/atelier"
                     className="btn-outline-light w-full sm:w-auto"

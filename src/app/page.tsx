@@ -42,7 +42,8 @@ export default async function HomePage() {
     {
       label: "Carnival",
       href: "/collections/sangeet-cocktail",
-      publicId: clips[1] ?? clips[0],
+      // Pinned, not index-picked: the client chose this film for Carnival.
+      publicId: "sanskar/occasion/carnival-lime-bandhgala",
       kind: "VIDEO",
     },
     {
@@ -61,7 +62,9 @@ export default async function HomePage() {
 
   const trio = [
     { publicId: clips[4], label: "Groom Edits", href: "/collections/groom-edits" },
-    { publicId: clips[5], label: "Festive Vibe", href: "/collections/festive-vibe" },
+    // Pinned: the clip this slot used to pick up was framed neck-down, so the
+    // model's face never appeared. This one keeps both faces in shot.
+    { publicId: "IMG_7624_vwnoyi", label: "Festive Vibe", href: "/collections/festive-vibe" },
     { publicId: clips[6], label: "Ceremony Edits", href: "/collections/ceremony-edits" },
   ].filter((t) => Boolean(t.publicId));
 

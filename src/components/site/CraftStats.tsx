@@ -4,7 +4,6 @@ import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const STATS = [
-  { value: 11, suffix: "", label: "Years in the atelier" },
   { value: 38, suffix: "", label: "Karigars on the floor" },
   { value: 900, suffix: "+", label: "Hours in a bridal piece" },
   { value: 3, suffix: "", label: "Fittings, always included" },
@@ -42,7 +41,7 @@ function Counter({ to, suffix }: { to: number; suffix: string }) {
 export function CraftStats() {
   return (
     <section className="border-y border-ink/10 bg-bone py-16 lg:py-20">
-      <div className="shell grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
+      <div className="shell grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-3">
         {STATS.map((s, i) => (
           <motion.div
             key={s.label}

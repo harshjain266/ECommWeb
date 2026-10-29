@@ -29,7 +29,7 @@ export const ABOUT_SECTIONS: AboutSection[] = [
       },
       {
         kind: "p",
-        text: "Zardozi, aari, dabka, gota and chikankari are all worked in-house in Shahpur Jat, alongside a jewellery bench doing repoussé, kundan setting and meenakari. For the first three years part of our aari went out to a workshop we did not control. The work came back fine and we had no idea who had done it or what they had been paid. Bringing it in cost us margin and a year of hiring, and it is the single best decision this house has made.",
+        text: "Zardozi, aari, dabka, gota and chikankari are all worked in-house in Chanakyapuri, alongside a jewellery bench doing repoussé, kundan setting and meenakari. For the first three years part of our aari went out to a workshop we did not control. The work came back fine and we had no idea who had done it or what they had been paid. Bringing it in cost us margin and a year of hiring, and it is the single best decision this house has made.",
       },
       {
         kind: "h",
@@ -50,7 +50,7 @@ export const ABOUT_SECTIONS: AboutSection[] = [
       },
       {
         kind: "p",
-        text: "Shahpur Jat, New Delhi. Tuesday to Saturday, 11am to 7pm, and by appointment on Sunday and Monday. Bridal consultations are booked rather than walked in, because they take ninety minutes and a designer has to be free for all of it.",
+        text: "Santushti Shopping Complex, Chanakyapuri, New Delhi. Tuesday to Saturday, 11am to 7pm, and by appointment on Sunday and Monday. Bridal consultations are booked rather than walked in, because they take ninety minutes and a designer has to be free for all of it.",
       },
     ],
   },

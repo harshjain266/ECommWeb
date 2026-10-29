@@ -60,7 +60,7 @@ export default async function AtelierPage({
   return (
     <SiteChrome>
       <PageHero
-        eyebrow="Shahpur Jat, New Delhi"
+        eyebrow="Chanakyapuri, New Delhi"
         title="The atelier"
         blurb="Everything we sell is cut, embroidered and finished on one floor, by people we employ directly. You are welcome to come and watch it happen."
         publicId={STILLS[6]}

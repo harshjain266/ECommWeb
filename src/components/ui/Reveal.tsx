@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -80,20 +80,25 @@ export function RevealWords({
         shown: { transition: { staggerChildren: 0.06, delayChildren: delay } },
       }}
     >
+      {/*
+        The separating space is a text node *between* the word masks, not the
+        last character inside one. Inside an inline-block, trailing whitespace
+        is collapsed away by the browser, so keeping it there ran every
+        heading together -- "Whereindividualitymeetscontemporary".
+      */}
       {words.map((word, i) => (
-        <span
-          key={`${word}-${i}`}
-          className="inline-block overflow-hidden align-bottom"
-        >
-          <motion.span
-            className="inline-block"
-            variants={{ hidden: { y: "110%" }, shown: { y: 0 } }}
-            transition={{ duration: 0.9, ease: EASE }}
-          >
-            {word}
-            {i < words.length - 1 ? " " : ""}
-          </motion.span>
-        </span>
+        <Fragment key={`${word}-${i}`}>
+          <span className="inline-block overflow-hidden align-bottom">
+            <motion.span
+              className="inline-block"
+              variants={{ hidden: { y: "110%" }, shown: { y: 0 } }}
+              transition={{ duration: 0.9, ease: EASE }}
+            >
+              {word}
+            </motion.span>
+          </span>
+          {i < words.length - 1 ? " " : null}
+        </Fragment>
       ))}
     </motion.span>
   );

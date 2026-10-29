@@ -1,8 +1,8 @@
 const NOTES = [
   "Complimentary shipping across India",
   "Made to measure in our Delhi atelier",
-  "Bridal appointments open for the 2026 season",
-  "Three fittings included on every bridal commission",
+  "Appointments open for the 2026 season",
+  "Three fittings included on every commission",
 ];
 
 /**

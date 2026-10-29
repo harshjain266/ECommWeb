@@ -290,7 +290,7 @@ export const CONTENT: Record<string, ContentPage> = {
       {
         kind: "list",
         items: [
-          "Shahpur Jat, New Delhi 110049",
+          "Shop-32, Santushti Shopping Complex, Airforce Tejas Camp, Chanakyapuri-110021",
           "atelier@sanskarandkabir.com",
           "+91 11 4123 4567",
           "Tuesday to Saturday, 11am — 7pm. Sunday and Monday by appointment only.",

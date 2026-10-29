@@ -122,7 +122,7 @@ export function appointmentAckEmail(a: { name: string; piece?: string | null }):
       "",
       `We have your request${a.piece ? ` about the <strong>${esc(a.piece)}</strong>` : ""}
        and will be in touch within two working days to confirm a slot.<br><br>
-       Consultations run Tuesday to Saturday, 11am to 7pm, at our Shahpur Jat studio.`,
+       Consultations run Tuesday to Saturday, 11am to 7pm, at our Chanakyapuri studio.`,
     ),
   );
 }

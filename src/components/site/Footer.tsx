@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import type { NavItem } from "@/lib/nav-shared";
-import { Monogram } from "./Wordmark";
+import { Wordmark } from "./Wordmark";
 
 const ABOUT_LINKS = [
   { label: "About the House", href: "/about" },
@@ -65,15 +65,9 @@ export function Footer({ nav }: { nav: NavItem[] }) {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-8">
           {/* ---- brand + newsletter ---- */}
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-3">
-              <Monogram className="h-9 w-9 text-gold" />
-              <p
-                className="label text-[17px] leading-none text-bone"
-                style={{ fontFamily: "var(--font-display)", letterSpacing: "0.2em" }}
-              >
-                SANSKAR <span className="text-gold">&amp;</span> KABIR
-              </p>
-            </div>
+            {/* Tinted to bone: the artwork is a single brown that all but
+                vanishes on the chocolate ground. */}
+            <Wordmark tone="bone" size="lg" layout="stack" className="items-start" />
 
             <p className="mt-5 max-w-sm font-sans text-sm leading-relaxed text-bone/55">
               A couture atelier in New Delhi. Clothes by Kabir, jewellery by
@@ -206,7 +200,7 @@ export function Footer({ nav }: { nav: NavItem[] }) {
                 </a>
               </li>
               <li className="font-sans text-[13px] leading-relaxed text-bone/55">
-                Shahpur Jat, New Delhi 110049
+                Shop-32, Santushti Shopping Complex, Airforce Tejas Camp, Chanakyapuri-110021
               </li>
             </ul>
           </div>
