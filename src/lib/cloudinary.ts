@@ -51,13 +51,18 @@ export type UploadResult = {
 export async function uploadBuffer(
   buffer: Buffer,
   filename: string,
+  /**
+   * Where it lands. Customer-sent references go to their own folder so they
+   * never show up in the admin media picker alongside studio artwork.
+   */
+  folder: string = UPLOAD_FOLDER,
 ): Promise<UploadResult> {
   const cld = getCloudinary();
   const isVideo = /\.(mov|mp4|m4v|webm|avi|mkv)$/i.test(filename);
 
   const result = await new Promise<Record<string, unknown>>((resolve, reject) => {
     const stream = cld.uploader.upload_stream(
-      { folder: UPLOAD_FOLDER, resource_type: isVideo ? "video" : "image" },
+      { folder, resource_type: isVideo ? "video" : "image" },
       (error, res) =>
         error ? reject(error) : resolve(res as unknown as Record<string, unknown>),
     );

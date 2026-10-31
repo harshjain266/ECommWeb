@@ -126,3 +126,69 @@ export function appointmentAckEmail(a: { name: string; piece?: string | null }):
     ),
   );
 }
+
+/** The notification the atelier receives for a bespoke commission. */
+export function commissionEmail(c: {
+  reference: string;
+  name: string;
+  email: string;
+  phone: string;
+  brief?: string | null;
+  metal?: string | null;
+  stones?: string | null;
+  budget?: string | null;
+  wearDate?: string | null;
+  referenceUrl?: string | null;
+}): string {
+  return SHELL(
+    `New commission — ${esc(c.reference)}`,
+    [
+      ROW("Reference", `<strong>${esc(c.reference)}</strong>`),
+      ROW("Name", esc(c.name)),
+      ROW("Phone", `<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`),
+      ROW("Email", `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`),
+      c.budget ? ROW("Budget", esc(c.budget)) : "",
+      c.wearDate ? ROW("Needed by", esc(c.wearDate)) : "",
+      c.metal ? ROW("Metal", esc(c.metal)) : "",
+      c.stones ? ROW("Stones", esc(c.stones)) : "",
+      c.brief ? ROW("Brief", esc(c.brief).replace(/\n/g, "<br>")) : "",
+      // A link rather than an attachment: Resend caps payload size, and the
+      // asset is already on a CDN the atelier can open on a phone.
+      c.referenceUrl
+        ? ROW(
+            "Their reference",
+            `<a href="${esc(c.referenceUrl)}">Open the file they sent</a>`,
+          )
+        : ROW("Their reference", "<em>none attached</em>"),
+    ].join(""),
+  );
+}
+
+/** The acknowledgement the visitor receives. */
+export function commissionAckEmail(c: {
+  reference: string;
+  name: string;
+  fee: string;
+}): string {
+  const first = c.name.split(/\s+/)[0] ?? c.name;
+  return SHELL(
+    `Thank you, ${esc(first)}`,
+    [
+      ROW(
+        "",
+        `We have your commission brief. Someone from the bench will call you
+         within two working days to talk it through.<br><br>
+         Your reference is <strong>${esc(c.reference)}</strong> — quote it if you
+         write back.`,
+      ),
+      ROW(
+        "",
+        `<span style="color:#6f513b">Nothing has been charged. The ${esc(
+          c.fee,
+        )} design fee becomes payable only once we have spoken and agreed what
+         is being made, and it is adjusted against the final invoice if you go
+         ahead.</span>`,
+      ),
+    ].join(""),
+  );
+}

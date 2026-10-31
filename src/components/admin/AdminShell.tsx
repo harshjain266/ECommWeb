@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  Gem,
 } from "lucide-react";
 import { LogoutButton } from "@/components/site/LogoutButton";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ const NAV = [
   { href: "/admin/products", label: "All products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: Receipt },
   { href: "/admin/appointments", label: "Appointments", icon: CalendarCheck },
+  { href: "/admin/commissions", label: "Commissions", icon: Gem },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
   { href: "/admin/media", label: "Media library", icon: Images },
   { href: "/admin/banners", label: "Homepage banners", icon: GalleryHorizontal },

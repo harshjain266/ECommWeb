@@ -42,7 +42,7 @@ export function OccasionEdit({ tiles }: { tiles: EditTile[] }) {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3">
+      <div className="grid gap-4 p-4 md:grid-cols-3 md:gap-5 md:p-5">
         {tiles.map((tile, i) => (
           <Reveal key={tile.href} delay={i * 0.08} y={0}>
             <Link href={tile.href} className="group relative block overflow-hidden">

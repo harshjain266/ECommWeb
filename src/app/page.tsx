@@ -41,14 +41,14 @@ export default async function HomePage() {
   const occasionTiles: EditTile[] = [
     {
       label: "Carnival",
-      href: "/collections/sangeet-cocktail",
+      href: "/collections/carnival",
       // Pinned, not index-picked: the client chose this film for Carnival.
       publicId: "sanskar/occasion/carnival-ivory-printed",
       kind: "VIDEO",
     },
     {
       label: "Sangeet",
-      href: "/collections/mehendi",
+      href: "/collections/sangeet-cocktail",
       publicId: clips[2] ?? clips[0],
       kind: "VIDEO",
     },

@@ -55,3 +55,53 @@ export function groupChildren(children: NavChild[]) {
 export function toMenuGroup(value: string | null | undefined): MenuGroup {
   return value === "OCCASION" || value === "COLLECTION" ? value : "CATEGORY";
 }
+
+export type MenuExtra = { name: string; href: string };
+
+/**
+ * Menu entries that are pages rather than shelves.
+ *
+ * The mega menu is built from the Category table, and every child it renders
+ * resolves to `/collections/<slug>`. The jewellery house has two pages that
+ * are not shelves at all -- a portfolio and a commission brief -- so they are
+ * declared here and rendered as their own column rather than being faked as
+ * empty categories.
+ */
+export const MENU_EXTRAS: Record<
+  string,
+  {
+    label: string;
+    items: MenuExtra[];
+    root?: string;
+    /**
+     * Render no shelf columns for this item.
+     *
+     * The jewellery house is a portfolio and a commission desk, not a rail of
+     * products. The shelves and their products are left intact and reachable
+     * at their own URLs -- this only stops the menu offering them.
+     */
+    hideShelves?: boolean;
+  }
+> = {
+  jewellery: {
+    label: "The Jewellery House",
+    /**
+     * Clicking the top-level item lands here instead of on the shelf.
+     * "Sanskar Gupta" is a house with a portfolio and a commission desk, not
+     * just a rail of products -- and sending the click straight to the shelf
+     * left the other two pages reachable only by hovering, which is how they
+     * went unnoticed.
+     */
+    root: "/jewellery",
+    hideShelves: true,
+    items: [
+      { name: "Portfolio", href: "/jewellery/portfolio" },
+      { name: "Design Your Own", href: "/jewellery/customise" },
+    ],
+  },
+};
+
+/** Where a top-level nav item points: its own page if it has one, else its shelf. */
+export function topHref(slug: string): string {
+  return MENU_EXTRAS[slug]?.root ?? `/collections/${slug}`;
+}

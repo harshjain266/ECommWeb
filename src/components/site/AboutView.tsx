@@ -21,7 +21,7 @@ export function AboutView({ slug }: { slug: string }) {
         eyebrow="The house"
         title={section.title}
         blurb={section.blurb}
-        publicId={STILLS[section.art % STILLS.length]}
+        publicId={section.heroId ?? STILLS[section.art % STILLS.length]}
       />
 
       <AboutTabs />
@@ -34,13 +34,17 @@ export function AboutView({ slug }: { slug: string }) {
                 name: "Sanskar",
                 role: "Jewellery Designer",
                 line: "Temple gold, polki and meenakari — trained on a bench before he ever drew on paper.",
-                art: STILLS[2],
+                art: "WhatsApp_Image_2026-10-31_at_11.51.58_PM_kx9v9w",
+                focus: undefined as string | undefined,
               },
               {
                 name: "Kabir",
                 role: "Fashion Designer",
                 line: "Pattern cutting first, surface second — hand-canvassed sherwanis and toile-fitted lehengas.",
-                art: STILLS[11],
+                // Shot landscape with Kabir off to the left; the 4/5 crop has to
+                // be pulled that way or it centres on the empty wall beside him.
+                art: "WhatsApp_Image_2026-11-01_at_12.02.35_AM_x8slzx",
+                focus: "35% center",
               },
             ].map((f, i) => (
               <Reveal key={f.name} delay={i * 0.1}>
@@ -50,6 +54,7 @@ export function AboutView({ slug }: { slug: string }) {
                     alt={`${f.name}, ${f.role}`}
                     ratio="4/5"
                     sizes="(min-width:640px) 45vw, 100vw"
+                    focus={f.focus}
                     grayscale
                   />
                   <figcaption className="mt-5">

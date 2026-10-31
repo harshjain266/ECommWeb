@@ -64,7 +64,7 @@ export function CldVideo({
 
   return (
     <div
-      className={cn("relative overflow-hidden bg-ink", className)}
+      className={cn("relative overflow-hidden bg-ink rounded-xl", className)}
       style={{
         ...(ratio ? { aspectRatio: ratio } : {}),
         backgroundImage: `url("${blurUrlFor(publicId, "VIDEO")}")`,

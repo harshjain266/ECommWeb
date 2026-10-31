@@ -5,7 +5,10 @@ export type AboutSection = {
   tab: string;
   title: string;
   blurb: string;
+  /** Fallback hero art: an index into STILLS. */
   art: number;
+  /** Explicit hero publicId, supplied by the house. Wins over `art`. */
+  heroId?: string;
   blocks: Block[];
 };
 
@@ -18,6 +21,7 @@ export const ABOUT_SECTIONS: AboutSection[] = [
     blurb:
       "Two disciplines under one roof: Kabir cuts the clothes, Sanskar sets the jewellery, and nothing leaves the building to be finished somewhere else.",
     art: 6,
+    heroId: "WhatsApp_Image_2026-10-31_at_5.07.43_PM_hnxlps",
     blocks: [
       {
         kind: "p",
@@ -62,6 +66,7 @@ export const ABOUT_SECTIONS: AboutSection[] = [
     blurb:
       "Sanskar, who sets the jewellery. Kabir, who cuts the clothes. The house is named in that order because that is the order they met the craft.",
     art: 10,
+    heroId: "WhatsApp_Image_2026-10-31_at_5.08.24_PM_rl0aup",
     blocks: [
       { kind: "h", text: "Sanskar — Jewellery Designer" },
       {

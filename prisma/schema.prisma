@@ -356,3 +356,60 @@ model Appointment {
 
   @@index([status, createdAt])
 }
+
+enum CommissionStatus {
+  NEW
+  REVIEWING
+  QUOTED
+  IN_PROGRESS
+  DELIVERED
+  CLOSED
+}
+
+/// A bespoke jewellery commission: someone has sent us a reference of the
+/// piece they want made.
+///
+/// Same discipline as `Appointment` -- the row is written before any email is
+/// attempted, because a commission enquiry that reaches nobody is the most
+/// expensive thing this site can lose. The uploaded reference lives in
+/// Cloudinary and only its public id is stored here.
+model Commission {
+  id        String @id @default(cuid())
+  /// Human-quotable, e.g. "SK-C-0007". Given to the customer on submit.
+  reference String @unique
+
+  name  String
+  email String
+  phone String
+
+  /// What they want made, in their own words.
+  brief String?
+
+  /// Triage fields. All optional -- a half-filled form is still a lead, so
+  /// nothing here is allowed to block a submission.
+  metal    String?
+  stones   String?
+  budget   String?
+  wearDate String?
+
+  /// The reference image or clip the visitor uploaded, if they attached one.
+  publicId  String?
+  mediaKind MediaKind @default(IMAGE)
+
+  /// The design fee quoted at the moment of submission, in paise. Stored per
+  /// row rather than read from a constant so that raising the fee later does
+  /// not silently rewrite what past customers were told.
+  feePaise Int     @default(99900)
+  feePaid  Boolean @default(false)
+
+  status CommissionStatus @default(NEW)
+
+  /// Whether the atelier notification actually went out, and why not.
+  notified    Boolean @default(false)
+  notifyError String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+}

@@ -56,7 +56,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                 width={1920}
                 priority
                 lazy={false}
-                className="h-full w-full"
+                className="h-full w-full rounded-none"
               />
             ) : (
               <CldImage
@@ -64,7 +64,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                 alt={slide.title}
                 priority
                 sizes="100vw"
-                className="h-full w-full"
+                className="h-full w-full rounded-none"
               />
             )}
           </motion.div>

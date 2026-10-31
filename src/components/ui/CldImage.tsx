@@ -52,7 +52,7 @@ export function CldImage({
   if (!publicId) {
     return (
       <div
-        className={cn("skeleton", className)}
+        className={cn("skeleton rounded-xl", className)}
         style={ratio ? { aspectRatio: ratio } : undefined}
         aria-hidden
       />
@@ -69,7 +69,7 @@ export function CldImage({
 
   return (
     <div
-      className={cn("relative overflow-hidden bg-bone-warm", className)}
+      className={cn("relative overflow-hidden bg-bone-warm rounded-xl", className)}
       style={{
         ...(ratio ? { aspectRatio: ratio } : {}),
         // Blur-up: a 24px render sits behind the real image as a CSS background,

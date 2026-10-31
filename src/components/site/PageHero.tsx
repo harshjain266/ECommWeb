@@ -21,8 +21,8 @@ export function PageHero({
             alt={title}
             priority
             sizes="100vw"
-            className="absolute inset-0 h-full w-full"
-            imgClassName="opacity-40"
+            className="absolute inset-0 h-full w-full rounded-none"
+            imgClassName="opacity-80"
           />
           <div className="absolute inset-0 scrim-full" />
         </>

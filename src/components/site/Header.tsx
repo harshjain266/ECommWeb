@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, Menu, Search, ShoppingBag, User, X, ChevronRight } from "lucide-react";
 import type { NavItem } from "@/lib/nav-shared";
-import { groupChildren } from "@/lib/nav-shared";
+import { groupChildren, MENU_EXTRAS, topHref } from "@/lib/nav-shared";
 import { CldImage } from "@/components/ui/CldImage";
 import { Wordmark } from "./Wordmark";
 import { SearchOverlay } from "./SearchOverlay";
@@ -84,7 +84,10 @@ export function Header({
   const panelOpen = openSlug !== null;
   const light = overHero && !scrolled && !panelOpen;
   const active = nav.find((n) => n.slug === openSlug) ?? null;
-  const columns = active ? groupChildren(active.children) : [];
+  const columns =
+    active && !MENU_EXTRAS[active.slug]?.hideShelves
+      ? groupChildren(active.children)
+      : [];
 
   return (
     <>
@@ -181,7 +184,7 @@ export function Header({
                 }}
               >
                 <Link
-                  href={`/collections/${item.slug}`}
+                  href={topHref(item.slug)}
                   className={cn(
                     "label link-sweep py-1 transition-colors duration-300",
                     item.featured && "text-gold",
@@ -213,7 +216,9 @@ export function Header({
 
         {/* ---- mega menu ---- */}
         <AnimatePresence>
-          {active && columns.length > 0 && (
+          {/* An item with no shelf columns can still have its own pages --
+              the jewellery house does -- so the panel opens for either. */}
+          {active && (columns.length > 0 || MENU_EXTRAS[active.slug]) && (
             <motion.div
               key={active.slug}
               initial={{ opacity: 0, y: -8 }}
@@ -252,6 +257,36 @@ export function Header({
                   </div>
                 ))}
 
+                {/* pages that are not shelves (e.g. the jewellery house) */}
+                {MENU_EXTRAS[active.slug] && (
+                  <div className="w-52 shrink-0">
+                    <p className="label text-ink-mute/60">
+                      {MENU_EXTRAS[active.slug].label}
+                    </p>
+                    <ul className="mt-4 space-y-2">
+                      {MENU_EXTRAS[active.slug].items.map((extra, i) => (
+                        <motion.li
+                          key={extra.href}
+                          initial={{ opacity: 0, x: -6 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{
+                            duration: 0.35,
+                            delay: 0.03 + columns.length * 0.04 + i * 0.02,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                        >
+                          <Link
+                            href={extra.href}
+                            className="group block font-sans text-[13px] leading-snug text-ink-mute transition-colors duration-300 hover:text-oxblood"
+                          >
+                            {extra.name}
+                          </Link>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {/* editorial tile */}
                 {active.imageId && (
                   <motion.div
@@ -261,7 +296,7 @@ export function Header({
                     className="ml-auto w-[clamp(300px,32vw,520px)] shrink-0"
                   >
                     <Link
-                      href={`/collections/${active.slug}`}
+                      href={topHref(active.slug)}
                       className="group block overflow-hidden"
                     >
                       <CldImage
@@ -337,7 +372,9 @@ function MobileNav({
         <nav className="flex-1 overflow-y-auto px-6 py-3" aria-label="Mobile">
           {nav.map((item) => {
             const open = expanded === item.slug;
-            const columns = groupChildren(item.children);
+            const columns = MENU_EXTRAS[item.slug]?.hideShelves
+              ? []
+              : groupChildren(item.children);
             return (
               <div key={item.slug} className="border-b border-ink/[0.07]">
                 <button
@@ -373,11 +410,11 @@ function MobileNav({
                       className="overflow-hidden"
                     >
                       <Link
-                        href={`/collections/${item.slug}`}
+                        href={topHref(item.slug)}
                         onClick={onClose}
                         className="label block py-2 text-gold"
                       >
-                        All {item.name}
+                        {MENU_EXTRAS[item.slug]?.root ? item.name : `All ${item.name}`}
                       </Link>
                       {columns.map((col) => (
                         <div key={col.group} className="pb-2">
@@ -397,6 +434,26 @@ function MobileNav({
                           </ul>
                         </div>
                       ))}
+                      {MENU_EXTRAS[item.slug] && (
+                        <div className="pb-2">
+                          <p className="label pt-2 text-ink-mute/50">
+                            {MENU_EXTRAS[item.slug].label}
+                          </p>
+                          <ul>
+                            {MENU_EXTRAS[item.slug].items.map((extra) => (
+                              <li key={extra.href}>
+                                <Link
+                                  href={extra.href}
+                                  onClick={onClose}
+                                  className="block py-2 font-sans text-[14px] text-ink-mute"
+                                >
+                                  {extra.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>

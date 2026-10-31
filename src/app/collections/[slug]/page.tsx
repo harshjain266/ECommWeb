@@ -98,8 +98,8 @@ export default async function CollectionPage({
                 width={1920}
                 priority
                 lazy={false}
-                className="absolute inset-0 h-full w-full"
-                videoClassName="opacity-45"
+                className="absolute inset-0 h-full w-full rounded-none"
+                videoClassName="opacity-80"
               />
             ) : (
               <CldImage
@@ -107,8 +107,8 @@ export default async function CollectionPage({
                 alt={category.name}
                 priority
                 sizes="100vw"
-                className="absolute inset-0 h-full w-full"
-                imgClassName="opacity-45"
+                className="absolute inset-0 h-full w-full rounded-none"
+                imgClassName="opacity-80"
               />
             )}
             <div className="absolute inset-0 scrim-full" />
