@@ -13,6 +13,19 @@ export function razorpayConfigured(): boolean {
   return Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
 }
 
+/**
+ * The key id the browser needs to open Razorpay Checkout.
+ *
+ * Falls back to the server-side id, and treats an empty string as unset --
+ * `NEXT_PUBLIC_RAZORPAY_KEY_ID=""` sits in most `.env` files copied from the
+ * example, and `??` happily hands that empty string to Checkout, which then
+ * refuses to open with no useful error.
+ */
+export function publicKeyId(): string | undefined {
+  const pub = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.trim();
+  return pub || process.env.RAZORPAY_KEY_ID?.trim() || undefined;
+}
+
 export function getRazorpay(): Razorpay {
   if (!razorpayConfigured()) {
     throw new Error(

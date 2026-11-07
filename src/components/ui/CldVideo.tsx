@@ -17,6 +17,24 @@ type Props = {
   /** Pass false to render a paused first frame until something else plays it. */
   autoPlay?: boolean;
   priority?: boolean;
+  /**
+   * Which second of the clip to freeze for the `poster`.
+   *
+   * Frame zero is the default and is very often the worst frame in a handheld
+   * clip -- the camera is still settling, so the poster is a smear until the
+   * video starts. Pass a second or two in for those.
+   */
+  posterAt?: number;
+  /** `contain` scales the whole frame in; `cover` fills and crops. */
+  fit?: "cover" | "contain";
+  /**
+   * Where to anchor the crop, as a CSS `object-position`.
+   *
+   * A portrait clip in a wide hero band is cropped by `object-cover`, which
+   * centres by default -- and the centre of a vertical phone clip is rarely
+   * the part worth showing. Pass "center 40%" and friends for those.
+   */
+  focus?: string;
 };
 
 /**
@@ -37,6 +55,9 @@ export function CldVideo({
   loop = true,
   autoPlay = true,
   priority = false,
+  posterAt = 0,
+  fit = "cover",
+  focus,
 }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
   const [active, setActive] = useState(!lazy || priority);
@@ -60,16 +81,24 @@ export function CldVideo({
     return () => io.disconnect();
   }, [autoPlay]);
 
-  const poster = videoPosterUrl(publicId, { width });
+  const poster = videoPosterUrl(publicId, { width }, posterAt);
 
   return (
     <div
-      className={cn("relative overflow-hidden bg-ink rounded-xl", className)}
+      className={cn(
+        "relative overflow-hidden rounded-xl",
+        fit === "contain" ? "bg-transparent" : "bg-ink",
+        className,
+      )}
       style={{
         ...(ratio ? { aspectRatio: ratio } : {}),
-        backgroundImage: `url("${blurUrlFor(publicId, "VIDEO")}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        ...(fit === "contain"
+          ? {}
+          : {
+              backgroundImage: `url("${blurUrlFor(publicId, "VIDEO")}")`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }),
       }}
     >
       <video
@@ -83,7 +112,12 @@ export function CldVideo({
         loop={loop}
         autoPlay={autoPlay && active}
         preload={priority ? "auto" : "none"}
-        className={cn("h-full w-full object-cover", videoClassName)}
+        className={cn(
+          "h-full w-full",
+          fit === "contain" ? "object-contain" : "object-cover",
+          videoClassName,
+        )}
+        style={focus ? { objectPosition: focus } : undefined}
       />
     </div>
   );

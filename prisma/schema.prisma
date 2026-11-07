@@ -402,6 +402,15 @@ model Commission {
   feePaise Int     @default(99900)
   feePaid  Boolean @default(false)
 
+  /// The design-fee payment, taken through Razorpay from the commission page
+  /// itself. Kept on the row rather than in `Payment`, which is bound one-to-one
+  /// to an Order: a commission is not an order, has no line items and no
+  /// address, and forcing one into existence to hold a ₹999 fee would corrupt
+  /// every order report on the site.
+  razorpayOrderId   String?   @unique
+  razorpayPaymentId String?
+  feePaidAt         DateTime?
+
   status CommissionStatus @default(NEW)
 
   /// Whether the atelier notification actually went out, and why not.

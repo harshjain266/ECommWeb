@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { findCart, toCartView } from "@/lib/cart";
 import { getSession } from "@/lib/session";
-import { getRazorpay, razorpayConfigured } from "@/lib/razorpay";
+import { getRazorpay, publicKeyId, razorpayConfigured } from "@/lib/razorpay";
 import { checkoutSchema, fieldErrors } from "@/lib/validators";
 import { nextOrderNumber } from "@/lib/orders";
 
@@ -140,7 +140,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       ok: true,
-      keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? process.env.RAZORPAY_KEY_ID,
+      keyId: publicKeyId(),
       razorpayOrderId: rzpOrder.id,
       amount: order.total,
       currency: "INR",

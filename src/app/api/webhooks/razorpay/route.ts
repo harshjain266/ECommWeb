@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyWebhookSignature } from "@/lib/razorpay";
+import { settleDesignFee } from "@/lib/commission-fee";
 
 /**
  * Razorpay webhook receiver.
@@ -67,7 +68,15 @@ async function settleCaptured(entity: Record<string, any>) {
     where: { razorpayOrderId },
     include: { order: { include: { items: true } } },
   });
-  if (!payment) return;
+
+  // Not a shop order. It may be a commission design fee, which is raised
+  // against the Commission row rather than against a Payment -- and the
+  // webhook is the only path that survives the customer closing the tab the
+  // moment their UPI app confirms.
+  if (!payment) {
+    await settleDesignFee(razorpayOrderId, String(entity.id ?? ""));
+    return;
+  }
 
   // Idempotency: the client verify route may have got here first.
   if (payment.status === "CAPTURED") return;

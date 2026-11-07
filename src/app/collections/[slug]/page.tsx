@@ -88,34 +88,98 @@ export default async function CollectionPage({
 
   return (
     <SiteChrome>
-      {/* ---- header band ---- */}
-      <section className="relative bg-ink">
+      {/* ---- header band ----
+
+           Full-bleed, but the artwork is *contained* rather than cropped.
+
+           The shelf art is portrait almost without exception and this band is
+           wide, so `object-cover` showed about a fifth of each image -- on a
+           garment shot, a strip of brocade with no garment in it. Containing
+           it instead shows the whole piece, scaled down, and the band is
+           filled edge to edge by a blurred blow-up of the same asset. That is
+           what keeps it a full-bleed banner with no letterbox bars, and no
+           second image to art-direct.
+      */}
+      <section className="relative isolate flex min-h-[clamp(340px,42vw,540px)] items-end overflow-hidden bg-ink">
         {category.imageId && (
           <>
-            {category.imageKind === "VIDEO" ? (
-              <CldVideo
-                publicId={category.imageId}
-                width={1920}
-                priority
-                lazy={false}
-                className="absolute inset-0 h-full w-full rounded-none"
-                videoClassName="opacity-80"
-              />
-            ) : (
-              <CldImage
-                publicId={category.imageId}
-                alt={category.name}
-                priority
-                sizes="100vw"
-                className="absolute inset-0 h-full w-full rounded-none"
-                imgClassName="opacity-80"
-              />
-            )}
-            <div className="absolute inset-0 scrim-full" />
+            {/* Ambient ground: the same asset again, blown up and thrown out
+                of focus, so the band is filled edge to edge by the piece
+                itself rather than by a flat panel of brown.
+
+                A video shelf gets the moving clip here too, not its poster --
+                a still ground behind a playing foreground reads as a bug. It
+                is fetched at 480px because nothing survives the blur anyway,
+                which keeps the second decode almost free. */}
+            <div aria-hidden className="absolute inset-0 scale-125">
+              {category.imageKind === "VIDEO" ? (
+                <CldVideo
+                  publicId={category.imageId}
+                  // Wide enough to survive a lighter blur: at 480 the ground
+                  // showed its own upscaling the moment the blur came down.
+                  width={960}
+                  priority
+                  lazy={false}
+                  className="h-full w-full rounded-none"
+                  videoClassName="blur-lg saturate-125"
+                />
+              ) : (
+                <CldImage
+                  publicId={category.imageId}
+                  alt=""
+                  priority
+                  sizes="100vw"
+                  widths={[960, 1280]}
+                  className="h-full w-full rounded-none"
+                  imgClassName="blur-lg saturate-125"
+                />
+              )}
+            </div>
+            {/* Light enough that the ground still reads as the piece. */}
+            <div className="absolute inset-0 bg-ink/20" />
+
+            {/* The artwork itself, whole, and held to the right half on wide
+                screens so the title has clean ground to sit on rather than
+                being read against a garment. */}
+            <div className="absolute inset-y-5 inset-x-0 lg:inset-y-7 lg:left-auto lg:right-0 lg:w-[56%]">
+              {category.imageKind === "VIDEO" ? (
+                <CldVideo
+                  publicId={category.imageId}
+                  width={1280}
+                  priority
+                  lazy={false}
+                  posterAt={2}
+                  fit="contain"
+                  className="h-full w-full rounded-none"
+                  videoClassName="drop-shadow-[0_24px_50px_rgba(0,0,0,0.55)]"
+                />
+              ) : (
+                <CldImage
+                  publicId={category.imageId}
+                  alt={category.name}
+                  priority
+                  fit="contain"
+                  sizes="100vw"
+                  widths={[640, 960, 1280, 1600]}
+                  className="h-full w-full rounded-none"
+                  imgClassName="drop-shadow-[0_24px_50px_rgba(0,0,0,0.55)]"
+                />
+              )}
+            </div>
+
+            {/* Legibility, weighted hard to the left where the type sits and
+                running out before it reaches the artwork. A flat scrim across
+                the whole band would grey the garment out, which is the one
+                thing on the page worth looking at. */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/35 via-28% to-transparent to-55%" />
+            {/* Narrow screens have no room to hold the art off to one side, so
+                the type lands on top of it; there the scrim has to come up
+                from the bottom instead. */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink via-ink/65 to-transparent lg:hidden" />
           </>
         )}
 
-        <div className="shell relative py-20 lg:py-28">
+        <div className="shell relative py-10 lg:py-14">
           <nav aria-label="Breadcrumb" className="label flex items-center gap-2 text-bone/50">
             <Link href="/" className="hover:text-bone">
               Home
@@ -123,25 +187,31 @@ export default async function CollectionPage({
             <span aria-hidden>/</span>
             {category.parent && (
               <>
-                <Link
-                  href={`/collections/${category.parent.slug}`}
-                  className="hover:text-bone"
-                >
-                  {category.parent.name}
-                </Link>
+                {/* A switched-off parent still names where this shelf sits,
+                    but its page 404s, so it is text rather than a link. */}
+                {category.parent.isActive ? (
+                  <Link
+                    href={`/collections/${category.parent.slug}`}
+                    className="hover:text-bone"
+                  >
+                    {category.parent.name}
+                  </Link>
+                ) : (
+                  <span>{category.parent.name}</span>
+                )}
                 <span aria-hidden>/</span>
               </>
             )}
             <span className="text-bone/80">{category.name}</span>
           </nav>
 
-          <h1 className="display mt-6 text-[clamp(2.6rem,8vw,6rem)] text-bone">
+          <h1 className="display mt-5 text-[clamp(2.4rem,6.5vw,4.8rem)] text-bone">
             <RevealWords text={category.name} />
           </h1>
 
           {category.description && (
             <Reveal delay={0.12}>
-              <p className="mt-5 max-w-xl text-pretty font-sans text-[15px] leading-relaxed text-bone/65">
+              <p className="mt-4 max-w-md text-pretty font-sans text-[15px] leading-relaxed text-bone/70">
                 {category.description}
               </p>
             </Reveal>

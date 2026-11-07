@@ -10,6 +10,7 @@ import { CldImage } from "@/components/ui/CldImage";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
 import { formatINR } from "@/lib/money";
+import { loadRazorpay, RAZORPAY_THEME } from "@/lib/load-razorpay";
 
 type Prefill = {
   email: string;
@@ -21,35 +22,6 @@ type Prefill = {
   state: string;
   pincode: string;
 };
-
-declare global {
-  interface Window {
-    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
-  }
-}
-
-const SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
-
-/** Load Razorpay Checkout on demand rather than on every page view. */
-function loadRazorpay(): Promise<boolean> {
-  return new Promise((resolve) => {
-    if (window.Razorpay) return resolve(true);
-    const existing = document.querySelector<HTMLScriptElement>(
-      `script[src="${SCRIPT_SRC}"]`,
-    );
-    if (existing) {
-      existing.addEventListener("load", () => resolve(true));
-      existing.addEventListener("error", () => resolve(false));
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = SCRIPT_SRC;
-    script.async = true;
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-}
 
 export function CheckoutForm({
   cart,
@@ -106,7 +78,7 @@ export function CheckoutForm({
       order_id: data.razorpayOrderId,
       prefill: data.prefill,
       notes: { orderNumber: data.orderNumber },
-      theme: { color: "#3E2516" },
+      theme: RAZORPAY_THEME,
       modal: {
         ondismiss: () => {
           setPending(false);

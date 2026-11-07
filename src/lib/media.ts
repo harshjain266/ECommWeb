@@ -52,6 +52,12 @@ function imageTransform(o: ImageOpts): string {
   if (o.height) t.push(`h_${Math.round(o.height)}`);
   if (o.crop) t.push(`c_${o.crop}`);
   else if (o.width && o.height) t.push("c_fill");
+  // Width-only requests default to `c_scale` on Cloudinary, which happily
+  // enlarges. A 480px phone clip asked for at 1920 then arrives as a soft,
+  // four-times-upscaled file that is also four times the bytes. `c_limit`
+  // scales down but never up, so a small source is served at its own size
+  // and stays as sharp as it ever was.
+  else if (o.width) t.push("c_limit");
   if (o.gravity) t.push(`g_${o.gravity}`);
   else if (o.width && o.height) t.push("g_auto");
   if (o.blur) t.push(`e_blur:${o.blur}`);
@@ -105,6 +111,9 @@ export function videoUrl(publicId: string, opts: VideoOpts = {}): string {
   if (opts.height) t.push(`h_${Math.round(opts.height)}`);
   if (opts.crop) t.push(`c_${opts.crop}`);
   else if (opts.width && opts.height) t.push("c_fill");
+  // Never enlarge -- see the note in `imageTransform`. Several of the shelf
+  // films are 480px-wide phone footage.
+  else if (opts.width) t.push("c_limit");
   // No `g_auto` here, unlike the image builder: Cloudinary rejects it on the
   // video pipeline -- "g_auto must be in a transformation component by
   // itself" -- and returns 400, so asking for both a width and a height used
@@ -116,11 +125,22 @@ export function videoUrl(publicId: string, opts: VideoOpts = {}): string {
   return `${BASE}/video/upload/${t.join(",")}/${id}.mp4`;
 }
 
-/** First frame of a clip, as a still -- used for `poster` so there is no black flash. */
-export function videoPosterUrl(publicId: string, opts: ImageOpts = {}): string {
+/**
+ * A frame of a clip, as a still -- used for `poster` so there is no black flash.
+ *
+ * `atSecond` defaults to the first frame, which is the right choice for a
+ * tripod shot and the wrong one for a handheld pan, where frame zero is a
+ * motion-blurred smear. Callers showing the latter should ask for a second or
+ * two in.
+ */
+export function videoPosterUrl(
+  publicId: string,
+  opts: ImageOpts = {},
+  atSecond = 0,
+): string {
   const id = normalizePublicId(publicId);
   if (!id) return "";
-  const t = ["so_0", imageTransform(opts)].join(",");
+  const t = [`so_${Math.max(0, Math.round(atSecond))}`, imageTransform(opts)].join(",");
   return `${BASE}/video/upload/${t}/${id}.jpg`;
 }
 

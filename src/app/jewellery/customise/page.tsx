@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
-import { Check, Mail, MessageCircle, Phone } from "lucide-react";
+import { Check, CreditCard, Mail, MessageCircle, Phone } from "lucide-react";
 import { CommissionForm } from "@/components/jewellery/CommissionForm";
+import { DesignFeeCheckout } from "@/components/jewellery/DesignFeeCheckout";
+import { TiltCard } from "@/components/jewellery/TiltCard";
 import { CldImage } from "@/components/ui/CldImage";
 import { Reveal, RevealWords } from "@/components/ui/Reveal";
 import { ATELIER } from "@/lib/atelier";
+import { razorpayConfigured } from "@/lib/razorpay";
 import {
-  ATELIER_AT_WORK,
+  BENCH_WALL,
   BRIEF_HINTS,
   COMMISSION_FAQS,
   PROCESS,
+  STUDIO,
   formatFee,
 } from "@/lib/jewellery";
 
@@ -19,17 +23,22 @@ export const metadata: Metadata = {
 };
 
 export default function CustomisePage() {
+  // Checked on the server so the fee panel never offers a payment route that
+  // would only 503 the moment someone pressed it.
+  const paymentsReady = razorpayConfigured();
+
   return (
     <>
       {/* ---- opening band ---- */}
       <section className="relative bg-ink">
         <CldImage
-          publicId={ATELIER_AT_WORK.landscape[0]}
-          alt="Sanskar modelling a piece at the tablet"
+          publicId={STUDIO.cad}
+          alt="Sanskar modelling a piece on the pen display"
           priority
           sizes="100vw"
           className="absolute inset-0 h-full w-full rounded-none"
-          imgClassName="opacity-70"
+          imgClassName="opacity-70 motion-safe:animate-slow-zoom"
+          focus="center 42%"
         />
         <div className="absolute inset-0 scrim-full" />
 
@@ -82,22 +91,36 @@ export default function CustomisePage() {
                   Covers CAD modelling, three rendered views and one round of
                   revisions. It is adjusted against your final invoice if you go
                   ahead — and it is <strong className="text-ink">not</strong>{" "}
-                  payable now. Send the brief first; we will call you, agree what
-                  is being made, and only then send a payment link.
+                  payable now. Send the brief first; we will call you and agree
+                  what is being made.
                 </p>
+                {paymentsReady && (
+                  <p className="mt-3 flex gap-2.5 border-t border-gold/25 pt-3 font-sans text-[13px] leading-relaxed text-ink-mute">
+                    <CreditCard
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold"
+                      strokeWidth={1.5}
+                    />
+                    <span>
+                      When it is time, you pay it here by UPI, card, netbanking
+                      or wallet — the link appears the moment your brief is sent,
+                      and again at the bottom of this page if you would rather
+                      come back to it.
+                    </span>
+                  </p>
+                )}
               </div>
 
               <div className="mt-8 space-y-2">
                 <p className="label text-ink-mute/70">Rather just talk?</p>
                 <a
-                  href={`tel:${ATELIER.phoneDigits}`}
+                  href={`tel:${ATELIER.phoneTel}`}
                   className="flex items-center gap-2.5 font-sans text-[13px] text-ink transition-colors hover:text-oxblood"
                 >
                   <Phone className="h-3.5 w-3.5" strokeWidth={1.5} />
                   {ATELIER.phone}
                 </a>
                 <a
-                  href={`https://wa.me/${ATELIER.phoneDigits}`}
+                  href={`https://wa.me/${ATELIER.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2.5 font-sans text-[13px] text-ink transition-colors hover:text-oxblood"
@@ -122,7 +145,7 @@ export default function CustomisePage() {
           {/* the form itself */}
           <div className="lg:col-span-7">
             <div className="rounded-xl border border-ink/10 bg-bone-warm/40 p-6 sm:p-8">
-              <CommissionForm />
+              <CommissionForm paymentsReady={paymentsReady} />
             </div>
           </div>
         </div>
@@ -144,19 +167,24 @@ export default function CustomisePage() {
           </div>
 
           <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
-            {ATELIER_AT_WORK.portrait.slice(0, 4).map((id, i) => (
-              <Reveal key={id} delay={i * 0.08}>
+            {BENCH_WALL.map((p, i) => (
+              <Reveal key={p.id} delay={i * 0.08}>
                 {/* Alternate columns sit lower, so the row reads as a wall
                     rather than as four things in a line. */}
                 <div className={i % 2 === 1 ? "lg:mt-10" : ""}>
-                  <CldImage
-                    publicId={id}
-                    alt="The jewellery bench at work"
-                    ratio="3/4"
-                    sizes="(min-width:1024px) 23vw, 46vw"
-                    widths={[400, 640, 800]}
-                    imgClassName="transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.05]"
-                  />
+                  <TiltCard max={8}>
+                    <CldImage
+                      publicId={p.publicId}
+                      alt={p.alt}
+                      ratio="3/4"
+                      sizes="(min-width:1024px) 23vw, 46vw"
+                      widths={[400, 640, 800]}
+                      imgClassName="transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.05]"
+                    />
+                  </TiltCard>
+                  <p className="mt-2.5 font-sans text-[11.5px] uppercase tracking-[0.16em] text-ink-mute/70">
+                    {p.title}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -191,6 +219,27 @@ export default function CustomisePage() {
           </ol>
         </div>
       </section>
+
+      {/* ---- paying the fee, for anyone coming back to it ---- */}
+      {paymentsReady && (
+        <section className="border-t border-ink/10 bg-ink py-16 lg:py-20">
+          <div className="shell max-w-2xl text-center">
+            <p className="label text-gold-light">Already spoken to us?</p>
+            <h2 className="display mt-4 text-[clamp(1.7rem,3.6vw,2.6rem)] text-bone">
+              <RevealWords text="Settle the design fee" />
+            </h2>
+            <p className="mx-auto mt-4 max-w-md font-sans text-[13px] leading-relaxed text-bone/60">
+              Your commission reference is on the acknowledgement we emailed you
+              — it looks like SK-C-0042. Enter it with the same email address and
+              the bench starts.
+            </p>
+
+            <div className="mx-auto mt-8 max-w-lg rounded-xl border border-bone/15 bg-white/[0.04] p-6 text-left sm:p-7">
+              <DesignFeeCheckout mode={{ kind: "lookup" }} tone="dark" />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ---- questions ---- */}
       <section className="border-t border-ink/10 bg-bone-warm py-16 lg:py-24">

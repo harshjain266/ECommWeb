@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import type { NavItem } from "@/lib/nav-shared";
+import { ATELIER, ATELIER_ADDRESS } from "@/lib/atelier";
 import { Wordmark } from "./Wordmark";
 
 const ABOUT_LINKS = [
@@ -22,7 +23,8 @@ const LEGAL_LINKS = [
   { label: "Care for Hand Embroidery", href: "/care" },
 ];
 
-const WHATSAPP = "919870196806";
+// Contact details come from `lib/atelier`, which exists precisely so a
+// moved studio or a changed number is one edit rather than eight.
 
 /** lucide v1 dropped brand marks, so these three are inlined. */
 function InstagramGlyph() {
@@ -113,7 +115,7 @@ export function Footer({ nav }: { nav: NavItem[] }) {
                 <LinkedInGlyph />
               </a>
               <a
-                href={`https://wa.me/${WHATSAPP}`}
+                href={`https://wa.me/${ATELIER.whatsapp}`}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="transition-colors hover:text-gold"
@@ -183,24 +185,24 @@ export function Footer({ nav }: { nav: NavItem[] }) {
             <ul className="mt-5 space-y-2.5">
               <li>
                 <a
-                  href="tel:+919870196806"
+                  href={`tel:${ATELIER.phoneTel}`}
                   className="flex items-center gap-2 font-sans text-[13px] text-bone/70 hover:text-bone"
                 >
                   <Phone className="h-3.5 w-3.5" strokeWidth={1.25} />
-                  +91 98701 96806
+                  {ATELIER.phone}
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:atelier@sanskarandkabir.com"
+                  href={`mailto:${ATELIER.email}`}
                   className="flex items-center gap-2 break-all font-sans text-[13px] text-bone/70 hover:text-bone"
                 >
                   <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.25} />
-                  atelier@sanskarandkabir.com
+                  {ATELIER.email}
                 </a>
               </li>
               <li className="font-sans text-[13px] leading-relaxed text-bone/55">
-                Shop-32, Santushti Shopping Complex, Airforce Tejas Camp, Chanakyapuri-110021
+                {ATELIER_ADDRESS}
               </li>
             </ul>
           </div>

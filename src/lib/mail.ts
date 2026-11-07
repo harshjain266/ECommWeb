@@ -14,13 +14,46 @@ import "server-only";
 
 export type MailResult = { ok: true } | { ok: false; error: string };
 
+/**
+ * Resend's shared sender, usable with nothing but an API key.
+ *
+ * It has one hard restriction: Resend will only deliver from it to the
+ * address that owns the Resend account. That is exactly enough for the one
+ * thing the atelier actually needs -- enquiries arriving in its own inbox --
+ * and not enough to write to a customer, which `canMailVisitors` below is
+ * about. Setting MAIL_FROM to a verified domain lifts both limits.
+ */
+const SHARED_SENDER = "Sanskar & Kabir <onboarding@resend.dev>";
+
+/** The address mail is sent from. */
+export function mailFrom(): string {
+  return process.env.MAIL_FROM?.trim() || SHARED_SENDER;
+}
+
+/**
+ * Enough configuration to notify the atelier.
+ *
+ * Only the API key is required: without MAIL_FROM we fall back to Resend's
+ * shared sender, which still reaches the studio's own inbox.
+ */
 export function mailConfigured(): boolean {
-  return Boolean(process.env.RESEND_API_KEY && process.env.MAIL_FROM);
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
+/**
+ * Whether we may write to someone who is not the account owner.
+ *
+ * False on the shared sender, where an acknowledgement to a customer is
+ * rejected by Resend -- so the caller skips it rather than firing a request
+ * per submission that can only fail.
+ */
+export function canMailVisitors(): boolean {
+  return Boolean(process.env.RESEND_API_KEY && process.env.MAIL_FROM?.trim());
 }
 
 /** Where atelier notifications land. Falls back to the from-address. */
 export function atelierInbox(): string | undefined {
-  return process.env.ATELIER_EMAIL || process.env.MAIL_FROM;
+  return process.env.ATELIER_EMAIL?.trim() || process.env.MAIL_FROM?.trim();
 }
 
 export async function sendMail(opts: {
@@ -30,7 +63,7 @@ export async function sendMail(opts: {
   replyTo?: string;
 }): Promise<MailResult> {
   if (!mailConfigured()) {
-    return { ok: false, error: "Email is not configured (RESEND_API_KEY / MAIL_FROM)" };
+    return { ok: false, error: "Email is not configured (set RESEND_API_KEY)" };
   }
 
   try {
@@ -41,7 +74,7 @@ export async function sendMail(opts: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: process.env.MAIL_FROM,
+        from: mailFrom(),
         to: [opts.to],
         subject: opts.subject,
         html: opts.html,

@@ -13,10 +13,17 @@ export const ATELIER = {
   city: "New Delhi",
   /** Short form for eyebrows and running prose. */
   area: "Chanakyapuri, New Delhi",
-  email: "atelier@sanskarandkabir.com",
-  phone: "+91 98701 96806",
-  /** Digits only, for `tel:` and `wa.me` links. */
-  phoneDigits: "919870196806",
+  email: "sanskarandkabir@gmail.com",
+  /** As written on the page. */
+  phone: "9718282121",
+  /** For `tel:` -- dialled from abroad, a bare local number does not connect. */
+  phoneTel: "+919718282121",
+  /**
+   * For `wa.me`, which requires the country code and nothing else. A bare
+   * "9718282121" resolves to no account at all, and a number with a space in
+   * it -- which is how the product page had it -- resolves to an error page.
+   */
+  whatsapp: "919718282121",
   hours: "Tuesday to Saturday, 11am to 7pm",
 } as const;
 

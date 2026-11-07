@@ -291,7 +291,7 @@ export const CONTENT: Record<string, ContentPage> = {
         kind: "list",
         items: [
           "Shop-32, Santushti Shopping Complex, Airforce Tejas Camp, Chanakyapuri-110021",
-          "atelier@sanskarandkabir.com",
+          "sanskarandkabir@gmail.com",
           "+91 11 4123 4567",
           "Tuesday to Saturday, 11am — 7pm. Sunday and Monday by appointment only.",
         ],
@@ -304,7 +304,7 @@ export const CONTENT: Record<string, ContentPage> = {
       { kind: "h", text: "Press and collaborations" },
       {
         kind: "p",
-        text: "Write to atelier@sanskarandkabir.com with PRESS in the subject line. We lend pieces for editorial and we are happy to have the work photographed on the floor.",
+        text: "Write to sanskarandkabir@gmail.com with PRESS in the subject line. We lend pieces for editorial and we are happy to have the work photographed on the floor.",
       },
       { kind: "h", text: "Existing orders" },
       {
@@ -344,7 +344,7 @@ export const CONTENT: Record<string, ContentPage> = {
       { kind: "h", text: "Your rights" },
       {
         kind: "p",
-        text: "Write to atelier@sanskarandkabir.com to see, correct or delete what we hold. We will action it within thirty days. Deleting your account removes your profile and measurements; order records are kept as long as tax law requires.",
+        text: "Write to sanskarandkabir@gmail.com to see, correct or delete what we hold. We will action it within thirty days. Deleting your account removes your profile and measurements; order records are kept as long as tax law requires.",
       },
     ],
   },

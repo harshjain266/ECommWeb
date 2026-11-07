@@ -60,6 +60,19 @@
       background-position: 200% 0;
     }
   }
+  /* A very slow push-in on hero media. Twenty-eight seconds, alternating, so
+     a still band breathes instead of sitting dead -- and slow enough that it
+     never reads as an animation, only as depth. */
+  --animate-slow-zoom: slow-zoom 28s ease-in-out infinite alternate;
+
+  @keyframes slow-zoom {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.08);
+    }
+  }
   @keyframes fade-up {
     0% {
       opacity: 0;

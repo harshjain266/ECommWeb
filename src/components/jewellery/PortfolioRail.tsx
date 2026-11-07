@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Pause, Play, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { imageUrl } from "@/lib/media";
 import type { Piece } from "@/lib/jewellery";
 
 /** How long each piece holds the centre before the rail advances. */
-const DWELL = 3600;
+const DWELL = 4200;
 
 /** How many cards either side of the centre are kept in the DOM. */
 const WING = 2;
@@ -15,18 +15,18 @@ const WING = 2;
 /**
  * The portfolio rail.
  *
- * One piece at a time, lit on black, advancing on its own — the pieces are
- * shot as objects rather than as a catalogue, so they earn more from being
- * presented one at a time than from being tiled.
+ * One piece at a time, lit on black, advancing on its own — these are shot as
+ * objects rather than as a catalogue, so they earn more from being presented
+ * one at a time than from being tiled.
  *
- * The cut-out PNGs do the heavy lifting: with the velvet and the shop counter
- * removed, the card has no edges and the piece simply floats, which is what
- * makes the reflection underneath read as a surface rather than as a trick.
+ * The transport is deliberately two arrows and nothing else: a counter and a
+ * pause button on a rail that already stops when you touch it were reading as
+ * instrumentation, not as a gallery.
  */
 export function PortfolioRail({ pieces }: { pieces: Piece[] }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [hold, setHold] = useState(false);
   const [lightbox, setLightbox] = useState(false);
   const stripRef = useRef<HTMLDivElement>(null);
 
@@ -39,10 +39,10 @@ export function PortfolioRail({ pieces }: { pieces: Piece[] }) {
   // Auto-advance. Paused while the lightbox is up, while the visitor is
   // hovering the rail, and whenever reduced motion is asked for.
   useEffect(() => {
-    if (!playing || lightbox || reduce) return;
+    if (hold || lightbox || reduce) return;
     const t = setTimeout(() => go(active + 1), DWELL);
     return () => clearTimeout(t);
-  }, [playing, lightbox, reduce, active, go]);
+  }, [hold, lightbox, reduce, active, go]);
 
   // Keep the active thumbnail in view as the rail moves on its own.
   useEffect(() => {
@@ -74,144 +74,108 @@ export function PortfolioRail({ pieces }: { pieces: Piece[] }) {
 
   return (
     <div
-      onMouseEnter={() => setPlaying(false)}
-      onMouseLeave={() => setPlaying(true)}
-      onFocusCapture={() => setPlaying(false)}
-      onBlurCapture={() => setPlaying(true)}
+      onMouseEnter={() => setHold(true)}
+      onMouseLeave={() => setHold(false)}
+      onFocusCapture={() => setHold(true)}
+      onBlurCapture={() => setHold(false)}
     >
       {/* ---- the stage ---- */}
-      <div
-        className="relative flex h-[clamp(300px,52vh,520px)] items-center justify-center"
-        style={{ perspective: 1600 }}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label="Portfolio"
-      >
-        {pieces.map((p, i) => {
-          // Shortest signed distance around the loop, so stepping past the
-          // end slides forward rather than rewinding through the whole rail.
-          let offset = i - active;
-          if (offset > pieces.length / 2) offset -= pieces.length;
-          if (offset < -pieces.length / 2) offset += pieces.length;
-          if (Math.abs(offset) > WING) return null;
+      <div className="relative">
+        <div
+          className="relative flex h-[clamp(300px,52vh,540px)] items-center justify-center"
+          style={{ perspective: 1600 }}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Portfolio"
+        >
+          {pieces.map((p, i) => {
+            // Shortest signed distance around the loop, so stepping past the
+            // end slides forward rather than rewinding through the whole rail.
+            let offset = i - active;
+            if (offset > pieces.length / 2) offset -= pieces.length;
+            if (offset < -pieces.length / 2) offset += pieces.length;
+            if (Math.abs(offset) > WING) return null;
 
-          const centre = offset === 0;
-          return (
-            <motion.button
-              key={p.cut}
-              type="button"
-              onClick={() => (centre ? setLightbox(true) : go(i))}
-              aria-label={centre ? `View larger: ${p.alt}` : `Go to ${p.alt}`}
-              aria-hidden={!centre}
-              tabIndex={centre ? 0 : -1}
-              className="absolute outline-none focus-visible:ring-1 focus-visible:ring-gold"
-              initial={false}
-              animate={{
-                x: `${offset * 58}%`,
-                scale: centre ? 1 : 0.62 - (Math.abs(offset) - 1) * 0.12,
-                rotateY: offset * -22,
-                opacity: centre ? 1 : 0.4 - (Math.abs(offset) - 1) * 0.18,
-                zIndex: 10 - Math.abs(offset),
-                filter: centre ? "blur(0px)" : "blur(1.5px)",
-              }}
-              transition={
-                reduce
-                  ? { duration: 0 }
-                  : { duration: 0.85, ease: [0.22, 1, 0.36, 1] }
-              }
-              style={{ transformStyle: "preserve-3d" }}
-            >
-              <img
-                src={imageUrl(p.cut, { width: 760 })}
-                alt={centre ? p.alt : ""}
-                loading={Math.abs(offset) <= 1 ? "eager" : "lazy"}
-                decoding="async"
-                className="h-[clamp(240px,42vh,440px)] w-auto max-w-[78vw] object-contain drop-shadow-[0_24px_40px_rgba(0,0,0,0.9)]"
-                style={{
-                  // A mirrored copy below the piece, faded out. WebKit-only;
-                  // where it is unsupported the piece simply sits on black,
-                  // which is the design minus one flourish.
-                  WebkitBoxReflect:
-                    "below 4px linear-gradient(transparent 58%, rgba(255,255,255,0.18))",
+            const centre = offset === 0;
+            return (
+              <motion.button
+                key={p.id}
+                type="button"
+                onClick={() => (centre ? setLightbox(true) : go(i))}
+                aria-label={centre ? `View larger: ${p.alt}` : `Go to ${p.title}`}
+                aria-hidden={!centre}
+                tabIndex={centre ? 0 : -1}
+                className="absolute rounded-2xl outline-none focus-visible:ring-1 focus-visible:ring-gold"
+                initial={false}
+                animate={{
+                  x: `${offset * 64}%`,
+                  scale: centre ? 1 : 0.74 - (Math.abs(offset) - 1) * 0.1,
+                  rotateY: offset * -26,
+                  opacity: centre ? 1 : 0.45 - (Math.abs(offset) - 1) * 0.2,
+                  zIndex: 10 - Math.abs(offset),
+                  filter: centre ? "blur(0px)" : "blur(2px)",
                 }}
-              />
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* ---- caption + transport ---- */}
-      <div className="mt-6 text-center">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={piece.cut}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.4 }}
-            className="mx-auto max-w-md font-display text-[17px] font-light leading-snug text-bone/75"
-            aria-live="polite"
-          >
-            {piece.alt}
-          </motion.p>
-        </AnimatePresence>
-
-        <div className="mt-5 flex items-center justify-center gap-3">
-          <RailButton label="Previous piece" onClick={() => step(-1)}>
-            <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
-          </RailButton>
-
-          <span className="label w-20 text-bone/45">
-            {String(active + 1).padStart(2, "0")} / {pieces.length}
-          </span>
-
-          <RailButton label="Next piece" onClick={() => step(1)}>
-            <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
-          </RailButton>
-
-          <RailButton
-            label={playing ? "Pause the rail" : "Play the rail"}
-            onClick={() => setPlaying((p) => !p)}
-          >
-            {playing ? (
-              <Pause className="h-3.5 w-3.5" strokeWidth={1.5} />
-            ) : (
-              <Play className="h-3.5 w-3.5" strokeWidth={1.5} />
-            )}
-          </RailButton>
+                transition={
+                  reduce
+                    ? { duration: 0 }
+                    : { duration: 0.85, ease: [0.22, 1, 0.36, 1] }
+                }
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                <img
+                  src={imageUrl(p.publicId, { width: 1000 })}
+                  alt={centre ? p.alt : ""}
+                  loading={Math.abs(offset) <= 1 ? "eager" : "lazy"}
+                  decoding="async"
+                  className="h-[clamp(260px,46vh,470px)] w-auto max-w-[82vw] rounded-2xl object-cover shadow-[0_30px_70px_-20px_rgba(0,0,0,0.95)] ring-1 ring-bone/10"
+                />
+                {/* A thin gold hairline that only lights the centre card. */}
+                <span
+                  aria-hidden
+                  className={`pointer-events-none absolute inset-0 rounded-2xl ring-1 transition-colors duration-700 ${
+                    centre ? "ring-gold/35" : "ring-transparent"
+                  }`}
+                />
+              </motion.button>
+            );
+          })}
         </div>
+
+        {/* ---- the transport: two arrows, nothing else ---- */}
+        <RailArrow side="left" label="Previous piece" onClick={() => step(-1)} />
+        <RailArrow side="right" label="Next piece" onClick={() => step(1)} />
       </div>
 
       {/* ---- thumbnails, which double as the position indicator ---- */}
       <div
         ref={stripRef}
-        className="no-scrollbar mt-9 flex gap-3 overflow-x-auto scroll-smooth px-1 pb-2"
+        className="no-scrollbar mt-8 flex gap-3 overflow-x-auto scroll-smooth px-1 pb-2"
       >
         {pieces.map((p, i) => (
           <button
-            key={p.cut}
+            key={p.id}
             type="button"
             onClick={() => go(i)}
-            aria-label={p.alt}
+            aria-label={p.title}
             aria-current={i === active}
-            className={`relative h-16 w-16 shrink-0 rounded-lg border transition-all duration-500 sm:h-20 sm:w-20 ${
+            className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border transition-all duration-500 sm:h-[68px] sm:w-[68px] ${
               i === active
                 ? "border-gold/70 opacity-100"
-                : "border-bone/10 opacity-45 hover:opacity-80"
+                : "border-bone/10 opacity-40 hover:opacity-80"
             }`}
           >
             <img
-              src={imageUrl(p.cut, { width: 160 })}
+              src={imageUrl(p.publicId, { width: 180 })}
               alt=""
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-contain p-1.5"
+              className="h-full w-full object-cover"
             />
           </button>
         ))}
       </div>
 
-      {/* ---- the original shot, on velvet, at full size ---- */}
+      {/* ---- the piece at full size ---- */}
       <AnimatePresence>
         {lightbox && (
           <motion.div
@@ -225,9 +189,7 @@ export function PortfolioRail({ pieces }: { pieces: Piece[] }) {
             aria-label={piece.alt}
           >
             <div className="flex items-center justify-between px-5 py-4">
-              <span className="label text-bone/50">
-                {active + 1} / {pieces.length}
-              </span>
+              <span className="label text-bone/50">{piece.title}</span>
               <button
                 type="button"
                 onClick={() => setLightbox(false)}
@@ -260,23 +222,26 @@ export function PortfolioRail({ pieces }: { pieces: Piece[] }) {
   );
 }
 
-function RailButton({
+function RailArrow({
+  side,
   label,
   onClick,
-  children,
 }: {
+  side: "left" | "right";
   label: string;
   onClick: () => void;
-  children: React.ReactNode;
 }) {
+  const Icon = side === "left" ? ChevronLeft : ChevronRight;
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="rounded-full border border-bone/15 p-2.5 text-bone/60 transition-colors hover:border-gold/50 hover:text-bone"
+      className={`absolute top-1/2 z-20 -translate-y-1/2 p-3 text-bone/45 transition-colors hover:text-bone ${
+        side === "left" ? "left-0 sm:left-2" : "right-0 sm:right-2"
+      }`}
     >
-      {children}
+      <Icon className="h-7 w-7 sm:h-9 sm:w-9" strokeWidth={1} />
     </button>
   );
 }

@@ -8,6 +8,7 @@ import { DESIGN_FEE_PAISE, formatFee } from "@/lib/jewellery";
 import {
   sendMail,
   mailConfigured,
+  canMailVisitors,
   atelierInbox,
   commissionEmail,
   commissionAckEmail,
@@ -199,17 +200,21 @@ export async function POST(req: Request) {
 
     if (toAtelier.ok) {
       notified = true;
-      void sendMail({
-        to: commission.email,
-        subject: `Your commission ${commission.reference} — Sanskar & Kabir`,
-        html: commissionAckEmail({
-          reference: commission.reference,
-          name: commission.name,
-          fee: formatFee(commission.feePaise),
-        }),
-      }).then((r) => {
-        if (!r.ok) console.warn(`[commission] ack to visitor failed: ${r.error}`);
-      });
+      // Skipped outright on Resend's shared sender, which may only write to
+      // the account owner: it would be one guaranteed rejection per brief.
+      if (canMailVisitors()) {
+        void sendMail({
+          to: commission.email,
+          subject: `Your commission ${commission.reference} — Sanskar & Kabir`,
+          html: commissionAckEmail({
+            reference: commission.reference,
+            name: commission.name,
+            fee: formatFee(commission.feePaise),
+          }),
+        }).then((r) => {
+          if (!r.ok) console.warn(`[commission] ack to visitor failed: ${r.error}`);
+        });
+      }
     } else {
       notifyError = [uploadError, toAtelier.error].filter(Boolean).join(" · ");
       console.error(`[commission] ${commission.reference} notify failed: ${notifyError}`);

@@ -12,12 +12,14 @@ import { ProductGrid } from "@/components/product/ProductGrid";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHead } from "@/components/site/SectionHead";
 import { imageUrl, videoPosterUrl } from "@/lib/media";
+import { ATELIER } from "@/lib/atelier";
 import { discountPercent, formatINR } from "@/lib/money";
 import { getWishlistIds } from "@/lib/wishlist";
 
 export const revalidate = 60;
 
-const WHATSAPP = "97182 82121";
+// Was a literal with a space in it, which wa.me reads as part of the number
+// and answers with an error page. One shared constant instead.
 
 type Params = { slug: string };
 
@@ -224,21 +226,21 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               <p className="label text-ink-mute">Need help with the product?</p>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 <a
-                  href="tel:+919870196806"
+                  href={`tel:${ATELIER.phoneTel}`}
                   className="flex flex-col items-center gap-1.5 border border-ink/15 py-4 transition-colors hover:border-ink"
                 >
                   <Phone className="h-4 w-4 text-ink-mute" strokeWidth={1.4} />
                   <span className="label text-ink">Call Us</span>
                 </a>
                 <a
-                  href={`mailto:atelier@sanskarandkabir.com?subject=${enquiry}`}
+                  href={`mailto:${ATELIER.email}?subject=${enquiry}`}
                   className="flex flex-col items-center gap-1.5 border border-ink/15 py-4 transition-colors hover:border-ink"
                 >
                   <Mail className="h-4 w-4 text-ink-mute" strokeWidth={1.4} />
                   <span className="label text-ink">Email Us</span>
                 </a>
                 <a
-                  href={`https://wa.me/${WHATSAPP}?text=${enquiry}`}
+                  href={`https://wa.me/${ATELIER.whatsapp}?text=${enquiry}`}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="flex flex-col items-center gap-1.5 border border-ink/15 py-4 transition-colors hover:border-ink"

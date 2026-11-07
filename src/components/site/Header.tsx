@@ -304,10 +304,14 @@ export function Header({
                         fromVideo={active.imageKind === "VIDEO"}
                         alt={active.name}
                         ratio="4/3"
-                        // The shelf art is portrait studio photography; a
-                        // centred crop into a landscape box cuts the head and
-                        // the collar off, which is the half worth seeing.
-                        focus="center 22%"
+                        // The shelf art is portrait studio photography, and a
+                        // landscape box shows only the middle half of it -- on
+                        // a full-length sherwani shot that is the chest and the
+                        // hem, with the face cut off above the frame. A fixed
+                        // `object-position` cannot fix all of them at once,
+                        // because the model stands at a different height in
+                        // each. Cloudinary crops to 4:3 per asset instead.
+                        smartCrop
                         sizes="(min-width:1024px) 32vw, 420px"
                         widths={[400, 640, 800]}
                         imgClassName="transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"

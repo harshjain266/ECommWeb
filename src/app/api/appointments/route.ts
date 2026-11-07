@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import {
   sendMail,
   mailConfigured,
+  canMailVisitors,
   atelierInbox,
   appointmentEmail,
   appointmentAckEmail,
@@ -84,13 +85,17 @@ export async function POST(req: Request) {
       notified = true;
       // The visitor acknowledgement is a courtesy; its failure is not recorded
       // against the enquiry, because the atelier already has what it needs.
-      void sendMail({
-        to: appointment.email,
-        subject: "We have your request — Sanskar & Kabir",
-        html: appointmentAckEmail(appointment),
-      }).then((r) => {
-        if (!r.ok) console.warn(`[appointment] ack to visitor failed: ${r.error}`);
-      });
+      // Skipped outright on Resend's shared sender, which may only write to
+      // the account owner: it would be one guaranteed rejection per enquiry.
+      if (canMailVisitors()) {
+        void sendMail({
+          to: appointment.email,
+          subject: "We have your request — Sanskar & Kabir",
+          html: appointmentAckEmail(appointment),
+        }).then((r) => {
+          if (!r.ok) console.warn(`[appointment] ack to visitor failed: ${r.error}`);
+        });
+      }
     } else {
       notifyError = toAtelier.error;
       console.error(`[appointment] ${appointment.id} notify failed: ${notifyError}`);

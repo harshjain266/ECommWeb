@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ImagePlus, Trash2 } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
+import { DesignFeeCheckout } from "./DesignFeeCheckout";
 import { formatFee } from "@/lib/jewellery";
 
 /** Mirrors the server cap. Checked here only so the error is instant. */
@@ -37,7 +38,7 @@ const BUDGETS = [
   "Above ₹10,00,000",
 ];
 
-type Done = { reference: string; message: string };
+type Done = { reference: string; message: string; email: string };
 
 /**
  * The commission brief.
@@ -50,7 +51,12 @@ type Done = { reference: string; message: string };
  * Submits as multipart because of the attachment; the whole thing goes to
  * one endpoint, which uploads to Cloudinary and writes the row together.
  */
-export function CommissionForm() {
+export function CommissionForm({
+  /** Hides the pay-now option when no Razorpay keys are configured. */
+  paymentsReady = false,
+}: {
+  paymentsReady?: boolean;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -103,7 +109,13 @@ export function CommissionForm() {
       setFields(data.fields ?? {});
       return;
     }
-    setDone({ reference: data.reference, message: data.message });
+    setDone({
+      reference: data.reference,
+      message: data.message,
+      // Kept so the design fee can be paid straight away without asking the
+      // customer to retype what they just typed.
+      email: String(fd.get("email") ?? ""),
+    });
   }
 
   if (done) {
@@ -112,7 +124,7 @@ export function CommissionForm() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="rounded-xl border border-gold/30 bg-bone p-8 text-center sm:p-10"
+        className="rounded-xl border border-gold/30 bg-bone p-7 text-center sm:p-9"
       >
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-ink">
           <Check className="h-5 w-5 text-gold-light" strokeWidth={1.5} />
@@ -122,6 +134,29 @@ export function CommissionForm() {
         <p className="mx-auto mt-4 max-w-sm font-sans text-sm leading-relaxed text-ink-mute">
           {done.message}
         </p>
+
+        {/* The fee, offered rather than demanded. The page has just promised
+            that nothing is charged before a conversation, so paying now has
+            to read as the shortcut it is — not as a toll gate. */}
+        {paymentsReady && (
+          <div className="mt-8 border-t border-ink/10 pt-7 text-left">
+            <p className="label text-gold">Want the bench to start sooner?</p>
+            <p className="mt-3 font-sans text-[13px] leading-relaxed text-ink-mute">
+              If you already know what you want made, you can settle the{" "}
+              {formatFee()} design fee now and we will begin modelling before we
+              call. It comes off your final invoice either way, and you are not
+              committed to ordering the piece.
+            </p>
+            <div className="mt-5">
+              <DesignFeeCheckout
+                mode={{ kind: "known", reference: done.reference, email: done.email }}
+              />
+            </div>
+            <p className="mt-4 text-center font-sans text-[12px] text-ink-mute">
+              Or do nothing at all — we will call you within two working days.
+            </p>
+          </div>
+        )}
       </motion.div>
     );
   }
@@ -281,8 +316,9 @@ export function CommissionForm() {
       </button>
 
       <p className="text-center font-sans text-[12px] leading-relaxed text-ink-mute">
-        Sending this costs nothing. The {formatFee()} design fee is payable only
-        after we have spoken and agreed what is being made.
+        Sending this costs nothing, and nothing is charged now. The {formatFee()}{" "}
+        design fee is settled once the brief is agreed — on the call, or online
+        the moment you send this, whichever you prefer.
       </p>
     </form>
   );

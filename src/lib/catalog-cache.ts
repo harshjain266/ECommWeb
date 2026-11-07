@@ -66,7 +66,10 @@ async function readCategory(slug: string) {
   return prisma.category.findUnique({
     where: { slug },
     include: {
-      parent: { select: { name: true, slug: true } },
+      // `isActive` comes back so a breadcrumb can decline to link a parent
+      // that has been switched off -- the shelf itself stays reachable, but
+      // its parent's landing page now 404s.
+      parent: { select: { name: true, slug: true, isActive: true } },
       children: {
         where: { isActive: true },
         orderBy: { position: "asc" },

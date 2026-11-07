@@ -120,7 +120,7 @@ export function ChatWidget() {
                               {ATELIER.email}
                             </a>
                             <a
-                              href={`tel:${ATELIER.phoneDigits}`}
+                              href={`tel:${ATELIER.phoneTel}`}
                               className="flex items-center gap-2 text-ink-mute transition-colors hover:text-oxblood"
                             >
                               <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
