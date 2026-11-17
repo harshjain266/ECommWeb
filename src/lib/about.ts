@@ -19,42 +19,33 @@ export const ABOUT_SECTIONS: AboutSection[] = [
     tab: "About the House",
     title: "About the House",
     blurb:
-      "Two disciplines under one roof: Kabir cuts the clothes, Sanskar sets the jewellery, and nothing leaves the building to be finished somewhere else.",
+      "A contemporary occasion-wear house established in October 2025 — clothing and custom jewellery for celebrations that deserve something personal.",
     art: 6,
     heroId: "WhatsApp_Image_2026-10-31_at_5.07.43_PM_hnxlps",
     blocks: [
       {
         kind: "p",
-        text: "Founded in 2014, Sanskar & Kabir sits at the point where two crafts normally sold separately are made together. Most couture houses commission their jewellery from a third party and hope the two read as one. We do not — the clothes and the pieces worn with them are designed in the same room, from the same palette, by two people who have been arguing about colour for a decade.",
-      },
-      {
-        kind: "h",
-        text: "One floor, thirty-eight hands",
+        text: "Established in October 2025, Sanskar & Kabir is a contemporary occasion-wear house rooted in the art of dressing for moments that matter.",
       },
       {
         kind: "p",
-        text: "Zardozi, aari, dabka, gota and chikankari are all worked in-house in Chanakyapuri, alongside a jewellery bench doing repoussé, kundan setting and meenakari. For the first three years part of our aari went out to a workshop we did not control. The work came back fine and we had no idea who had done it or what they had been paid. Bringing it in cost us margin and a year of hiring, and it is the single best decision this house has made.",
-      },
-      {
-        kind: "h",
-        text: "What we will not do",
-      },
-      {
-        kind: "list",
-        items: [
-          "Synthetic zari. It stays bright for a decade and then flakes. Real zari dulls into something warmer, and that is the point.",
-          "Machine-run gota. It is faster and it is visibly flatter.",
-          "Pre-cut mirror discs. Hand-cut shisha reflects irregularly, which is the whole character of the technique.",
-          "Outsourced embroidery. If we cannot tell you who made it, we will not sell it.",
-        ],
-      },
-      {
-        kind: "h",
-        text: "Where to find us",
+        text: "We believe occasion wear is more than what you wear — it is how you choose to be remembered.",
       },
       {
         kind: "p",
-        text: "Santushti Shopping Complex, Chanakyapuri, New Delhi. Tuesday to Saturday, 11am to 7pm, and by appointment on Sunday and Monday. Bridal consultations are booked rather than walked in, because they take ninety minutes and a designer has to be free for all of it.",
+        text: "Our collections bring together thoughtful silhouettes, refined fabrics and distinctive details, created for celebrations that deserve something personal. From intimate festivities to grand wedding occasions, every piece is designed to feel timeless yet distinctly your own.",
+      },
+      {
+        kind: "p",
+        text: "At Sanskar & Kabir, we also believe that the smallest details can complete an entire look. Alongside our clothing, we offer custom jewellery designed to complement your outfit, your occasion and your individual style.",
+      },
+      {
+        kind: "p",
+        text: "With a focus on craftsmanship, customization and effortless elegance, we create pieces that go beyond the occasion — pieces that become a part of your story.",
+      },
+      {
+        kind: "h",
+        text: "Made for celebrations. Shaped by you.",
       },
     ],
   },
