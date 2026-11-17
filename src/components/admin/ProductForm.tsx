@@ -25,6 +25,8 @@ export type ProductFormValues = {
   fabric: string;
   color: string;
   craft: string;
+  customisationTime: string;
+  components: string;
   careNotes: string;
   isActive: boolean;
   isFeatured: boolean;
@@ -48,6 +50,8 @@ const EMPTY: ProductFormValues = {
   fabric: "",
   color: "",
   craft: "",
+  customisationTime: "",
+  components: "",
   careNotes: "",
   isActive: true,
   isFeatured: false,
@@ -564,6 +568,8 @@ export function ProductForm({
                   ["fabric", "Fabric", "Raw silk, tissue organza dupatta"],
                   ["color", "Colour", "Deep crimson, antique gold"],
                   ["craft", "Craft", "Zardozi, dabka, kora"],
+                  ["components", "Components", "Bandhgala, kurta, trouser"],
+                  ["customisationTime", "Customisation time", "15 days"],
                 ] as const
               ).map(([key, label, placeholder]) => (
                 <div key={key}>

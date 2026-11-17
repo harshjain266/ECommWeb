@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllProducts } from "@/lib/catalog-cache";
+import { getAllProducts, getHeroBanner } from "@/lib/catalog-cache";
 import { SiteChrome } from "@/components/site/SiteChrome";
+import { CollectionBanner } from "@/components/site/CollectionBanner";
+import { RevealWords } from "@/components/ui/Reveal";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { CollectionToolbar, type SortKey } from "@/components/product/CollectionToolbar";
 import { getWishlistIds } from "@/lib/wishlist";
@@ -39,7 +41,11 @@ export default async function AllDesignsPage({
 
   const current = Math.max(1, Number(page) || 1);
 
-  const [all, wishlist] = await Promise.all([getAllProducts(), getWishlistIds()]);
+  const [all, wishlist, banner] = await Promise.all([
+    getAllProducts(),
+    getWishlistIds(),
+    getHeroBanner(),
+  ]);
 
   const prices = all.map((p) => p.price);
   const floor = prices.length ? Math.min(...prices) : 0;
@@ -80,16 +86,33 @@ export default async function AllDesignsPage({
   ].sort((a, b) => a - b);
 
   return (
-    <SiteChrome>
-      <div className="shell py-12 lg:py-16">
-        <div className="text-center">
-          <p className="label text-gold">The full house</p>
-          <h1 className="display mt-4 text-[clamp(2.2rem,6vw,3.6rem)] text-ink">
-            View all designs
-          </h1>
-        </div>
+    <SiteChrome overHero>
+      {/* ---- header band: the same full-bleed idiom as the front door.
+           This shelf is the whole house, so it borrows the hero film rather
+           than any one category's still. ---- */}
+      <CollectionBanner
+        publicId={banner?.publicId}
+        kind={banner?.kind === "VIDEO" ? "VIDEO" : "IMAGE"}
+      >
+        <nav aria-label="Breadcrumb" className="label flex items-center gap-2 text-bone/50">
+          <Link href="/" className="hover:text-bone">
+            Home
+          </Link>
+          <span aria-hidden>/</span>
+          <span className="text-bone/80">View all designs</span>
+        </nav>
 
-        <div className="mt-12">
+        <h1 className="display mt-5 text-[clamp(2.4rem,6.5vw,4.8rem)] text-bone">
+          <RevealWords text="View all designs" />
+        </h1>
+
+        <p className="mt-4 max-w-md text-pretty font-sans text-[15px] leading-relaxed text-bone/70">
+          Every piece in the house — clothes and jewellery, in one place.
+        </p>
+      </CollectionBanner>
+
+      <div className="shell py-12 lg:py-16">
+        <div>
           <CollectionToolbar
             count={total}
             sort={sortKey}

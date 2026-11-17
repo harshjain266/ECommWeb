@@ -12,6 +12,10 @@ export type ProductSeed = {
   fabric: string;
   color: string;
   craft: string;
+  /** What the ensemble comprises; shown as its own Description line. */
+  components?: string;
+  /** Turnaround quoted on the Description panel, e.g. "15 days". */
+  customisationTime?: string;
   featured?: boolean;
   newArrival?: boolean;
   sizes?: "WOMEN" | "MEN" | "ONE" | "JEWEL";

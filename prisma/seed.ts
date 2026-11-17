@@ -224,6 +224,8 @@ async function main() {
         fabric: p.fabric,
         color: p.color,
         craft: p.craft,
+        components: p.components ?? null,
+        customisationTime: p.customisationTime ?? null,
         careNotes: WASHCARE,
         deliveryInfo: DELIVERY_INFO,
         disclaimer: DISCLAIMER,

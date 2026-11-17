@@ -33,6 +33,8 @@ export const POST = withAdmin(async (req) => {
       fabric: d.fabric || null,
       color: d.color || null,
       craft: d.craft || null,
+      customisationTime: d.customisationTime || null,
+      components: d.components || null,
       careNotes: d.careNotes || null,
       isActive: d.isActive,
       isFeatured: d.isFeatured,

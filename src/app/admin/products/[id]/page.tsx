@@ -56,6 +56,8 @@ export default async function EditProductPage({
           fabric: product.fabric ?? "",
           color: product.color ?? "",
           craft: product.craft ?? "",
+          customisationTime: product.customisationTime ?? "",
+          components: product.components ?? "",
           careNotes: product.careNotes ?? "",
           isActive: product.isActive,
           isFeatured: product.isFeatured,

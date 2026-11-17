@@ -77,6 +77,8 @@ export const productSchema = z.object({
   fabric: z.string().max(120).optional().or(z.literal("")),
   color: z.string().max(80).optional().or(z.literal("")),
   craft: z.string().max(160).optional().or(z.literal("")),
+  customisationTime: z.string().max(120).optional().or(z.literal("")),
+  components: z.string().max(200).optional().or(z.literal("")),
   careNotes: z.string().max(500).optional().or(z.literal("")),
   isActive: z.coerce.boolean().default(true),
   isFeatured: z.coerce.boolean().default(false),

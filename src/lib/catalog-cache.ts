@@ -212,6 +212,24 @@ export const getProduct = cache((slug: string) =>
   })(),
 );
 
+/**
+ * The first active hero film, for pages that want the front door's banner
+ * but have no artwork of their own -- "View all designs" is the whole house,
+ * so no one shelf's still speaks for it.
+ */
+export const getHeroBanner = cache(
+  unstable_cache(
+    () =>
+      prisma.banner.findFirst({
+        where: { slot: "HERO", isActive: true },
+        orderBy: { position: "asc" },
+        select: { publicId: true, kind: true },
+      }),
+    ["hero-banner"],
+    { tags: [TAGS.nav], revalidate: 300 },
+  ),
+);
+
 /** "You may also like" -- same shelf, excluding the piece being viewed. */
 export const getRelatedProducts = cache(
   (productId: string, categoryId: string | null, take = 4) =>

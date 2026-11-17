@@ -115,6 +115,10 @@ model Product {
   fabric        String?
   color         String?
   craft         String?
+  /// Turnaround quoted on the Description panel, e.g. "15 days"
+  customisationTime String?
+  /// What the ensemble comprises, e.g. "Bandhgala, Kurta, Trouser"
+  components    String?
   /// Accordion panels on the product page
   careNotes     String?
   deliveryInfo  String?

@@ -6,7 +6,7 @@ import { getProduct, getRelatedProducts } from "@/lib/catalog-cache";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { AddToCart } from "@/components/product/AddToCart";
-import { ProductAccordion } from "@/components/product/ProductAccordion";
+import { ProductAccordion, type Panel } from "@/components/product/ProductAccordion";
 import { CustomisationDialog } from "@/components/product/CustomisationDialog";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { Reveal } from "@/components/ui/Reveal";
@@ -62,27 +62,24 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
   const off = discountPercent(product.price, product.compareAtPrice);
 
+  // Named details, each on its own line under the description rather than
+  // strung together with middots. "Reference" was the house word for the
+  // article number; the floor calls it the SKU, so that is what it says.
   const specs = [
+    ["SKU", product.sku],
+    ["Customisation Time", product.customisationTime],
     ["Fabric", product.fabric],
     ["Colour", product.color],
+    ["Components", product.components],
     ["Craft", product.craft],
-    ["Reference", product.sku],
   ].filter(([, v]) => Boolean(v)) as [string, string][];
 
-  const panels = [
-    {
-      label: "Product Information",
-      body: [
-        product.description,
-        specs.map(([k, v]) => `${k}: ${v}`).join(" · "),
-      ]
-        .filter(Boolean)
-        .join("\n\n"),
-    },
+  const panels: Panel[] = [
+    { label: "Description", body: product.description, specs },
     product.deliveryInfo && { label: "Delivery Timelines", body: product.deliveryInfo },
     product.disclaimer && { label: "Disclaimer", body: product.disclaimer },
     product.careNotes && { label: "Washcare", body: product.careNotes },
-  ].filter(Boolean) as { label: string; body: string }[];
+  ].filter(Boolean) as Panel[];
 
   const jsonLd = {
     "@context": "https://schema.org",
